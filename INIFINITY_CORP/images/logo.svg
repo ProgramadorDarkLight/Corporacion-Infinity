@@ -1,0 +1,39 @@
+<!--?xml version="1.0" encoding="UTF-8"?-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 600" width="1200" height="600">
+
+  <defs>
+    <!-- Gradiente principal -->
+    <linearGradient id="infinityGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#00ffcc"></stop>
+      <stop offset="50%" stop-color="#00cc99"></stop>
+      <stop offset="100%" stop-color="#009977"></stop>
+    </linearGradient>
+
+    <!-- Brillo -->
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="6" result="coloredBlur"></feGaussianBlur>
+      <feMerge>
+        <feMergeNode in="coloredBlur"></feMergeNode>
+        <feMergeNode in="SourceGraphic"></feMergeNode>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Fondo transparente -->
+  <rect width="100%" height="100%" fill="none"></rect>
+
+  <!-- Símbolo infinito -->
+  <path d="
+      M 300 300
+      C 300 180, 520 180, 600 300
+      C 680 420, 900 420, 900 300
+      C 900 180, 680 180, 600 300
+      C 520 420, 300 420, 300 300
+      Z" fill="none" stroke="url(#infinityGradient)" stroke-width="45" stroke-linecap="round" stroke-linejoin="round" filter="url(#glow)"></path>
+
+  <!-- Texto Infinity Corp -->
+  <text x="600" y="500" text-anchor="middle" font-family="Segoe UI, Montserrat, Arial, sans-serif" font-size="72" font-weight="600" fill="url(#infinityGradient)">
+    Infinity Corp.
+  </text>
+
+</svg>

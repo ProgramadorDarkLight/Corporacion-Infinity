@@ -1,0 +1,60 @@
+<!--?xml version="1.0" encoding="UTF-8"?-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1400 700" width="1400" height="700">
+
+  <defs>
+    <!-- Liquid Metal Chrome -->
+    <linearGradient id="quantumChrome" x1="0%" y1="0%" x2="400%" y2="0%">
+      <stop offset="0%" stop-color="#e6fdff"></stop>
+      <stop offset="12%" stop-color="#00faff"></stop>
+      <stop offset="25%" stop-color="#00ffb8"></stop>
+      <stop offset="40%" stop-color="#7fffd4"></stop>
+      <stop offset="55%" stop-color="#1e90ff"></stop>
+      <stop offset="70%" stop-color="#00cfff"></stop>
+      <stop offset="85%" stop-color="#00ffee"></stop>
+      <stop offset="100%" stop-color="#e6fdff"></stop>
+      <animateTransform attributeName="gradientTransform" type="translate" from="0 0" to="-1400 0" dur="12s" repeatCount="indefinite"></animateTransform>
+    </linearGradient>
+
+    <!-- Metal Depth -->
+    <linearGradient id="metalDepth" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="rgba(255,255,255,0.9)"></stop>
+      <stop offset="50%" stop-color="rgba(255,255,255,0.25)"></stop>
+      <stop offset="100%" stop-color="rgba(0,0,0,0.3)"></stop>
+    </linearGradient>
+
+    <!-- Quantum Glow -->
+    <filter id="quantumGlow">
+      <feGaussianBlur stdDeviation="14" result="blur"></feGaussianBlur>
+      <feMerge>
+        <feMergeNode in="blur"></feMergeNode>
+        <feMergeNode in="SourceGraphic"></feMergeNode>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Infinity Symbol -->
+  <path d="
+      M 360 350
+      C 360 200, 600 200, 700 350
+      C 800 500, 1040 500, 1040 350
+      C 1040 200, 800 200, 700 350
+      C 600 500, 360 500, 360 350
+      Z" fill="none" stroke="url(#quantumChrome)" stroke-width="58" stroke-linecap="round" stroke-linejoin="round" filter="url(#quantumGlow)" stroke-dasharray="2400">
+    <animate attributeName="stroke-dashoffset" from="0" to="-2400" dur="14s" repeatCount="indefinite"></animate>
+  </path>
+
+  <!-- Depth Layer -->
+  <path d="
+      M 390 350
+      C 390 240, 600 240, 700 350
+      C 800 460, 1010 460, 1010 350
+      C 1010 240, 800 240, 700 350
+      C 600 460, 390 460, 390 350
+      Z" fill="none" stroke="url(#metalDepth)" stroke-width="22" stroke-opacity="0.45"></path>
+
+  <!-- Corporate Text -->
+  <text x="700" y="620" text-anchor="middle" font-family="Montserrat, Segoe UI, Arial, sans-serif" font-size="78" font-weight="600" letter-spacing="3" fill="url(#quantumChrome)" filter="url(#quantumGlow)">
+    Infinity Corp.
+  </text>
+
+</svg>

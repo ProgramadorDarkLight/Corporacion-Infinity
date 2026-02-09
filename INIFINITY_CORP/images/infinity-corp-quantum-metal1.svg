@@ -1,0 +1,83 @@
+<!--?xml version="1.0" encoding="UTF-8"?-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1400 700" width="1400" height="700">
+
+  <defs>
+    <!-- Gradiente liquid metal multicapas -->
+    <linearGradient id="quantumChrome" x1="0%" y1="0%" x2="400%" y2="0%">
+      <stop offset="0%" stop-color="#e6fdff"></stop>
+      <stop offset="10%" stop-color="#00faff"></stop>
+      <stop offset="20%" stop-color="#00ffb8"></stop>
+      <stop offset="35%" stop-color="#7fffd4"></stop>
+      <stop offset="50%" stop-color="#1e90ff"></stop>
+      <stop offset="65%" stop-color="#00cfff"></stop>
+      <stop offset="80%" stop-color="#00ffea"></stop>
+      <stop offset="100%" stop-color="#e6fdff"></stop>
+
+      <animateTransform attributeName="gradientTransform" type="translate" from="0 0" to="-1200 0" dur="10s" repeatCount="indefinite"></animateTransform>
+    </linearGradient>
+
+    <!-- Profundidad metálica -->
+    <linearGradient id="depthShade" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="rgba(255,255,255,0.9)"></stop>
+      <stop offset="50%" stop-color="rgba(255,255,255,0.25)"></stop>
+      <stop offset="100%" stop-color="rgba(0,0,0,0.25)"></stop>
+    </linearGradient>
+
+    <!-- Glow cuántico -->
+    <filter id="quantumGlow">
+      <feGaussianBlur stdDeviation="12" result="blur"></feGaussianBlur>
+      <feMerge>
+        <feMergeNode in="blur"></feMergeNode>
+        <feMergeNode in="SourceGraphic"></feMergeNode>
+      </feMerge>
+    </filter>
+
+    <!-- Pulso energético -->
+    <filter id="energyPulse">
+      <feColorMatrix type="matrix" values="
+          1 0 0 0 0
+          0 1 0 0 0
+          0 0 1 0 0
+          0 0 0 1.2 -0.1"></feColorMatrix>
+    </filter>
+  </defs>
+
+  <!-- Fondo transparente -->
+  <rect width="100%" height="100%" fill="none"></rect>
+
+  <!-- Capa base metal -->
+  <path d="
+      M 360 350
+      C 360 200, 600 200, 700 350
+      C 800 500, 1040 500, 1040 350
+      C 1040 200, 800 200, 700 350
+      C 600 500, 360 500, 360 350
+      Z" fill="none" stroke="url(#quantumChrome)" stroke-width="56" stroke-linecap="round" stroke-linejoin="round" filter="url(#quantumGlow)" stroke-dasharray="2200">
+
+    <animate attributeName="stroke-dashoffset" from="0" to="-2200" dur="12s" repeatCount="indefinite"></animate>
+  </path>
+
+  <!-- Capa profundidad -->
+  <path d="
+      M 380 350
+      C 380 230, 600 230, 700 350
+      C 800 470, 1020 470, 1020 350
+      C 1020 230, 800 230, 700 350
+      C 600 470, 380 470, 380 350
+      Z" fill="none" stroke="url(#depthShade)" stroke-width="20" stroke-linecap="round" stroke-opacity="0.45"></path>
+
+  <!-- Halo energético -->
+  <path d="
+      M 360 350
+      C 360 200, 600 200, 700 350
+      C 800 500, 1040 500, 1040 350
+      C 1040 200, 800 200, 700 350
+      C 600 500, 360 500, 360 350
+      Z" fill="none" stroke="#9ffcff" stroke-width="10" stroke-opacity="0.4" filter="url(#energyPulse)"></path>
+
+  <!-- Texto corporativo -->
+  <text x="700" y="610" text-anchor="middle" font-family="Montserrat, Segoe UI, Arial, sans-serif" font-size="76" font-weight="600" letter-spacing="3" fill="url(#quantumChrome)" filter="url(#quantumGlow)">
+    Infinity Corp.
+  </text>
+
+</svg>

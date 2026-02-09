@@ -1,0 +1,66 @@
+<!--?xml version="1.0" encoding="UTF-8"?-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 600" width="1200" height="600">
+
+  <defs>
+    <!-- Gradiente cromado animado -->
+    <linearGradient id="chromeGradient" x1="0%" y1="0%" x2="200%" y2="0%">
+      <stop offset="0%" stop-color="#00eaff"></stop>
+      <stop offset="25%" stop-color="#00ff99"></stop>
+      <stop offset="50%" stop-color="#7fffd4"></stop>
+      <stop offset="75%" stop-color="#00bfff"></stop>
+      <stop offset="100%" stop-color="#00eaff"></stop>
+
+      <animateTransform attributeName="gradientTransform" type="translate" from="0 0" to="-600 0" dur="4s" repeatCount="indefinite"></animateTransform>
+    </linearGradient>
+
+    <!-- Brillo dinámico -->
+    <filter id="neonGlow">
+      <feGaussianBlur stdDeviation="8" result="blur"></feGaussianBlur>
+      <feMerge>
+        <feMergeNode in="blur"></feMergeNode>
+        <feMergeNode in="SourceGraphic"></feMergeNode>
+      </feMerge>
+    </filter>
+
+    <!-- Destello animado -->
+    <linearGradient id="shine" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="rgba(255,255,255,0)"></stop>
+      <stop offset="50%" stop-color="rgba(255,255,255,0.8)"></stop>
+      <stop offset="100%" stop-color="rgba(255,255,255,0)"></stop>
+    </linearGradient>
+  </defs>
+
+  <!-- Fondo transparente -->
+  <rect width="100%" height="100%" fill="none"></rect>
+
+  <!-- Símbolo infinito -->
+  <path d="
+      M 300 300
+      C 300 180, 520 180, 600 300
+      C 680 420, 900 420, 900 300
+      C 900 180, 680 180, 600 300
+      C 520 420, 300 420, 300 300
+      Z" fill="none" stroke="url(#chromeGradient)" stroke-width="45" stroke-linecap="round" stroke-linejoin="round" filter="url(#neonGlow)">
+    
+    <!-- Animación de trazo -->
+    <animate attributeName="stroke-dasharray" from="0,2000" to="2000,0" dur="6s" repeatCount="indefinite"></animate>
+  </path>
+
+  <!-- Destello que recorre el símbolo -->
+  <path d="
+      M 300 300
+      C 300 180, 520 180, 600 300
+      C 680 420, 900 420, 900 300
+      C 900 180, 680 180, 600 300
+      C 520 420, 300 420, 300 300
+      Z" fill="none" stroke="url(#shine)" stroke-width="12" stroke-linecap="round" stroke-dasharray="150 1850">
+    
+    <animate attributeName="stroke-dashoffset" from="0" to="-2000" dur="3s" repeatCount="indefinite"></animate>
+  </path>
+
+  <!-- Texto -->
+  <text x="600" y="500" text-anchor="middle" font-family="Montserrat, Segoe UI, Arial, sans-serif" font-size="72" font-weight="600" fill="url(#chromeGradient)" filter="url(#neonGlow)">
+    Infinity Corp.
+  </text>
+
+</svg>
