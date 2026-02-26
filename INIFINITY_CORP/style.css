@@ -177,9 +177,26 @@ blockquote p {
 
 .btn:hover, .btn:focus, .btn-current {
   color: #fff;
-  background: #16a085;
+  background: #ffbf00;
+  
 }
 
+/* Animacion RubberBand 
+
+
+  🟡 #D4AF37 - Oro
+
+    ⬜ #FFFFFF - Blanco
+
+    🟠 #FFBF00 - Ámbar
+
+    🟥 #800020 - Granate
+
+    ⬜ #C0C0C0 - Plata
+
+    🔵 #00FFFF - Cian brillante
+
+*/
 .btn:hover, .social-set a:hover, .team-social a i:hover, .header-carousel .owl-buttons .owl-prev:hover, .header-carousel .owl-buttons .owl-next:hover {
   -webkit-animation: rubberBand .8s 1;
      -moz-animation: rubberBand .8s 1;
