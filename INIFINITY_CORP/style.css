@@ -1,29 +1,29 @@
 /*
-	The7 by TEMPLATE STOCK
-	templatestock.co @templatestock
-	Released for free under the Creative Commons Attribution 3.0 license (templated.co/license)
+	The7 Infinity por InfinityCorp
+	
+	Licencia Corporativa Sin Anim De Lucro (CC BY-NC-SA 4.0)
 */
 
 /*
 
-[Table of content]
+[Tabla de Contenidos]
 
-1. General Styling
-2. Header
-3. Home Slider, Parallax & Video
-4. Services Section
-5. Work Section
-6. Logo Carousel
-7. CLient Carousel
-8. Blog Section
-9. Pricing Section
-10. Contact & Comment Forms
-11. Footer
-12. Loader
-13. Clearfix
+1. Estilos Generales
+2. Cabeza
+3. Slider, paralax y contenido destacado
+4. Seccion Servicios
+5. Seccion Trabajos Recientes
+6. Carrusel Logo
+7. Carrusel Cliente
+8. Seccion Blog
+9. Seccion Precios
+10. Contactos, Mapas y Formularios
+11. Pie de Pagina
+12. Cargando
+13. Clear y Fixes
 
 
-[Color codes]
+[Codigo Colores]
 Green #1abc9c
 Dark Blue #16a085
 Grey #ECF0F1
@@ -31,9 +31,8 @@ Grey #ECF0F1
 */
 
 /* *********************************************************
-  General Styling 
+  Estilos Generales 
 ********************************************************* */
-
 *, *:before, *:after {
   box-sizing: border-box;
 }
@@ -178,9 +177,26 @@ blockquote p {
 
 .btn:hover, .btn:focus, .btn-current {
   color: #fff;
-  background: #16a085;
+  background: #ffbf00;
+  
 }
 
+/* Animacion RubberBand 
+
+
+  🟡 #D4AF37 - Oro
+
+    ⬜ #FFFFFF - Blanco
+
+    🟠 #FFBF00 - Ámbar
+
+    🟥 #800020 - Granate
+
+    ⬜ #C0C0C0 - Plata
+
+    🔵 #00FFFF - Cian brillante
+
+*/
 .btn:hover, .social-set a:hover, .team-social a i:hover, .header-carousel .owl-buttons .owl-prev:hover, .header-carousel .owl-buttons .owl-next:hover {
   -webkit-animation: rubberBand .8s 1;
      -moz-animation: rubberBand .8s 1;
@@ -1106,7 +1122,7 @@ blockquote p {
 }
 
 /* *********************************************************
- Map, Contact & Comment Forms
+ Mapas, Contactos & Comentarios Formularios
 ********************************************************* */
 
 .map {
@@ -1815,3 +1831,17 @@ footer p, footer a {
     font-size: 1.5em;
     padding: 8px;
   }
+
+
+}
+
+/* *********************************************************
+  Centrar Imagen - Nuestro Equipo*/
+
+  
+.col-12-12 {
+    display: flex;
+    justify-content: center; /* Centrado horizontal */
+    align-items: center; /* Centrado vertical (opcional) */
+    width: 100%; /* Asegura que tome el ancho completo */
+}
