@@ -6,7 +6,7 @@ from datetime import datetime, timedelta
 # Conectar a la base de datos PostgreSQL
 class ConexionDB:
 
-    def __init__(self, dbname="inventario", user="postgres", password="1234", host="localhost", port="5432"):
+    def __init__(self, dbname="inventario8Corp", user="DarkLight", password="Zeus9119*", host="localhost", port="5432"):
         try:
             self.conn = psycopg2.connect(dbname=dbname, user=user, password=password, host=host, port=port)
             self.cur = self.conn.cursor()
