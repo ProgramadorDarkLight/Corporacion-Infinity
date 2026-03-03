@@ -58,10 +58,12 @@ def buscar_producto():
     cargar_productos(busqueda)
 
 def agregar_producto():
+
     def guardar_producto():
+    
         nombre = entry_nombre.get()
         descripcion = entry_descripcion.get()
-        precio = float(entry_precio.get())
+        precio = int(entry_precio.get())
         stock = int(entry_stock.get())
 
         try:
@@ -280,7 +282,7 @@ def balance_general():
 
 # Crear la ventana principal
 ventana = tk.Tk()
-ventana.title("Sistema de Control y Financiero de Inventarios")
+ventana.title("Sistema de Control y Financiero de Inventarios INFINITY 8 CORP   - 2026")
 
 # Conexión a la base de datos
 db = ConexionDB()
