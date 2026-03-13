@@ -9,13 +9,21 @@ class ConexionDB:
     def __init__(self, dbname="inventario8Corp", user="DarkLight", password="Zeus9119*", host="localhost", port="5432"):
         try:
             self.conn = psycopg2.connect(dbname=dbname, user=user, password=password, host=host, port=port)
+
             self.cur = self.conn.cursor()
+            self.cur.execute("SET search_path TO inventario8Corp, public")
+            self.conn.commit()
+
+
             print("Conexión a la base de datos establecida")
+            print("Esquema actual: inventario8Corp")
 
         except Exception as e:
 
             print(f"Error al conectar a la base de datos. Excepción:{e}")
+
             self.conn = None
+
             self.cur = None
 
     def close(self):
@@ -47,14 +55,21 @@ def obtener_productos(busqueda=""):
         return []
 
 def cargar_productos(busqueda=""):
+
     for item in treeview_productos.get_children():
+
         treeview_productos.delete(item)
+
     productos = obtener_productos(busqueda)
+
     for producto in productos:
+
         treeview_productos.insert("", "end", values=producto)
 
 def buscar_producto():
+
     busqueda = entry_buscar.get()
+    
     cargar_productos(busqueda)
 
 def agregar_producto():
@@ -292,6 +307,7 @@ frame_inventario = ttk.Frame(ventana)
 frame_inventario.pack(fill="both", expand=True)
 
 treeview_productos = ttk.Treeview(frame_inventario, columns=("id", "nombre", "descripcion", "precio", "stock"), show="headings")
+
 treeview_productos.column("#0", width=0, stretch=tk.NO)
 treeview_productos.column("id", anchor=tk.W, width=50)
 treeview_productos.column("nombre", anchor=tk.W, width=200)
