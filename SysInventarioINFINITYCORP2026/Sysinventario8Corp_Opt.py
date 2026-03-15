@@ -84,20 +84,24 @@ class Config:
 # CONEXIÓN A BASE DE DATOS
 # ============================================
 class ConexionDB:
+   
     """Gestor de conexión a PostgreSQL"""
     
     def __init__(self):
         """Inicializa la conexión a la base de datos"""
+   
         config = Config.get_config()
         
         try:
             # Establece conexión con PostgreSQL
             self.conn = psycopg2.connect(
+
                 dbname=config['dbname'],
                 user=config['user'],
                 password=config['password'],
                 host=config['host'],
                 port=config['port']
+
             )
             
             # Crea cursor para ejecutar consultas
