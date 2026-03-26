@@ -113,8 +113,10 @@ class ConexionDB:
             
             # Verificar y crear columna codigo_barras si no existe
             self.verificar_columna_codigo_barras()
+            self.verificar_columna_iva()
             
             print("✅ Conexión a la base de datos establecida")
+
             print(f"📁 Esquema configurado: {config['schema']}")
             
         except Exception as e:
@@ -146,6 +148,32 @@ class ConexionDB:
         except Exception as e:
             print(f"⚠️ Error al verificar/crear columna codigo_barras: {e}")
             self.conn.rollback()
+
+    def verificar_columna_iva(self):
+        """Verifica si existe la columna iva y la crea si no existe"""
+        try:
+            # Verificar si la columna existe
+            self.cur.execute("""
+                SELECT column_name 
+                FROM information_schema.columns 
+                WHERE table_name='productos' AND column_name='iva'
+            """)
+            
+            if not self.cur.fetchone():
+                print("📦 Agregando columna 'iva' a la tabla productos...")
+                self.cur.execute("""
+                    ALTER TABLE productos 
+                    ADD COLUMN iva DECIMAL(5,2) DEFAULT 0
+                """)
+                self.conn.commit()
+                print("✅ Columna 'iva' agregada exitosamente")
+            else:
+                print("✓ La columna 'iva' ya existe")
+                
+        except Exception as e:
+            print(f"⚠️ Error al verificar/crear columna iva: {e}")
+            self.conn.rollback()
+
 
     def close(self):
         """Cierra la conexión a la base de datos"""
@@ -401,6 +429,7 @@ def agregar_producto():
             precio = validar_numero(entry_precio.get(), 'float', 'precio')
             stock = validar_numero(entry_stock.get(), 'int', 'stock')
             codigo_barras = entry_codigo_barras.get().strip() or None
+            
             
             if precio <= 0:
                 raise ValueError("❌ El precio debe ser mayor a 0")
@@ -752,11 +781,15 @@ def comprar_producto():
     btn_cancelar.pack(side="left", padx=10)
 
 def vender_producto():
+    
     """Abre ventana para registrar venta"""
     
     def procesar_venta():
+    
         """Procesa la venta en BD"""
+    
         try:
+    
             producto_id = validar_numero(entry_producto_id.get(), 'int', 'ID')
             cantidad = validar_numero(entry_cantidad.get(), 'int', 'cantidad')
             cliente = validar_texto_no_vacio(entry_cliente.get(), "Cliente")
@@ -777,6 +810,7 @@ def vender_producto():
             
             # Calcula nuevo stock y total
             nuevo_stock = producto[0] - cantidad
+
             total_venta = cantidad * producto[1]
             
             # Verifica si existe la tabla ventas
@@ -784,9 +818,12 @@ def vender_producto():
                 # Actualiza stock y registra venta
                 db.cur.execute("UPDATE productos SET stock = %s WHERE id = %s", (nuevo_stock, producto_id))
                 db.cur.execute("""
+                               
                     INSERT INTO ventas (producto_id, cantidad, cliente, fecha, total) 
                     VALUES (%s, %s, %s, %s, %s)
+                               
                 """, (producto_id, cantidad, cliente, fecha, total_venta))
+
             except psycopg2.errors.UndefinedTable:
                 # Crear tabla ventas si no existe
                 db.cur.execute("""
@@ -807,10 +844,20 @@ def vender_producto():
             
             db.conn.commit()
             messagebox.showinfo(
+
                 "✅ VENTA EXITOSA",
                 f"💰 Total: ${total_venta:.2f}\n👤 Cliente: {cliente}"
+            
             )
+            
+            messagebox.showinfo( 
+            
+                "📦 STOCK ACTUALIZADO",
+                f"Producto ID {producto_id}\nStock restante: {nuevo_stock} unidades"
+            )
+            
             ventana_venta.destroy()
+            
             cargar_productos()
             
         except ValueError as e:
@@ -1115,16 +1162,21 @@ botones_config = [
 
 # Crear botones en grid
 for i, (texto, comando, color) in enumerate(botones_config):
+
     fila = 0 if i < 3 else 1
+
     columna = i if i < 3 else i - 3
     
     btn = crear_boton_estilizado(
+
         button_frame,
         texto,
         comando,
         color,
         ancho=14
+
     )
+    
     btn.grid(row=fila, column=columna, padx=5, pady=5)
 
 # ----- BARRA DE ESTADO -----
@@ -1161,14 +1213,21 @@ cargar_productos()
 # MANEJO DE CIERRE
 # ============================================
 def on_closing():
+    
     """Maneja el cierre de la aplicación"""
+
     if messagebox.askokcancel(
+    
         "👋 SALIR",
         "¿Cerrar CYBER INVENTORY 2026?"
+
     ):
         if db:
+    
             db.close()
+    
         ventana.destroy()
+        ventana
 
 ventana.protocol("WM_DELETE_WINDOW", on_closing)
 
@@ -1176,4 +1235,5 @@ ventana.protocol("WM_DELETE_WINDOW", on_closing)
 # INICIO DE APLICACIÓN
 # ============================================
 if __name__ == "__main__":
+    
     ventana.mainloop()
