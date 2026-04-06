@@ -1,0 +1,530 @@
+sql
+
+-- =====================================================
+-- SISTEMA EL HORMIGUERO IBAGUÉ
+-- Base de datos para medio de comunicación investigativo
+-- =====================================================
+
+-- 1. ELIMINAR LA BASE DE DATOS SI EXISTE (OPCIONAL - USAR CON CUIDADO)
+-- DROP DATABASE IF EXISTS hormiguero_db;
+
+-- 2. CREAR LA BASE DE DATOS
+CREATE DATABASE hormiguero_db
+    WITH 
+    OWNER = postgres
+    ENCODING = 'UTF8'
+    LC_COLLATE = 'Spanish_Colombia.1252'
+    LC_CTYPE = 'Spanish_Colombia.1252'
+    TABLESPACE = pg_default
+    CONNECTION LIMIT = -1;
+
+-- 3. CONECTARSE A LA NUEVA BASE DE DATOS
+\c hormiguero_db;
+
+-- 4. CREAR ESQUEMAS
+CREATE SCHEMA IF NOT EXISTS public;
+CREATE SCHEMA IF NOT EXISTS auditoria;
+CREATE SCHEMA IF NOT EXISTS reportes;
+
+-- 5. CONFIGURAR EL ESQUEMA POR DEFECTO
+SET search_path TO public, auditoria, reportes;
+
+-- =====================================================
+-- CREACIÓN DE TABLAS
+-- =====================================================
+
+-- 5.1 TABLA DE USUARIOS
+CREATE TABLE IF NOT EXISTS public.usuarios (
+    id SERIAL PRIMARY KEY,
+    username VARCHAR(50) UNIQUE NOT NULL,
+    password VARCHAR(255) NOT NULL,
+    email VARCHAR(100) NOT NULL,
+    nombres VARCHAR(100),
+    apellidos VARCHAR(100),
+    documento_identidad VARCHAR(20),
+    telefono VARCHAR(20),
+    direccion TEXT,
+    tipo_usuario VARCHAR(20) DEFAULT 'ciudadano' CHECK (tipo_usuario IN ('ciudadano', 'revisor', 'administrador')),
+    estado VARCHAR(20) DEFAULT 'activo' CHECK (estado IN ('activo', 'inactivo', 'bloqueado')),
+    fecha_registro TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    fecha_ultimo_login TIMESTAMP,
+    ultimo_ip INET,
+    intentos_fallidos INTEGER DEFAULT 0,
+    activo BOOLEAN DEFAULT TRUE,
+    CONSTRAINT uk_username UNIQUE (username),
+    CONSTRAINT uk_email UNIQUE (email)
+);
+
+-- Índices para usuarios
+CREATE INDEX IF NOT EXISTS idx_usuarios_username ON public.usuarios(username);
+CREATE INDEX IF NOT EXISTS idx_usuarios_email ON public.usuarios(email);
+CREATE INDEX IF NOT EXISTS idx_usuarios_tipo ON public.usuarios(tipo_usuario);
+CREATE INDEX IF NOT EXISTS idx_usuarios_estado ON public.usuarios(estado);
+
+-- 5.2 TABLA DE CATEGORÍAS (PARA ORGANIZAR MEJOR)
+CREATE TABLE IF NOT EXISTS public.categorias (
+    id SERIAL PRIMARY KEY,
+    nombre VARCHAR(50) UNIQUE NOT NULL,
+    descripcion TEXT,
+    activo BOOLEAN DEFAULT TRUE,
+    fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Insertar categorías predefinidas
+INSERT INTO public.categorias (nombre, descripcion) VALUES
+('Corrupción', 'Denuncias sobre actos de corrupción administrativa'),
+('Inseguridad', 'Problemas de seguridad ciudadana'),
+('Servicios Públicos', 'Fallas en servicios como agua, luz, gas, etc.'),
+('Medio Ambiente', 'Problemas ambientales y ecológicos'),
+('Derechos Humanos', 'Violaciones a derechos humanos'),
+('Salud', 'Problemas en el sistema de salud'),
+('Educación', 'Problemas en instituciones educativas'),
+('Infraestructura', 'Problemas de infraestructura vial y urbana'),
+('Otros', 'Otras denuncias no clasificadas')
+ON CONFLICT (nombre) DO NOTHING;
+
+-- 5.3 TABLA DE NOTICIAS/DENUNCIAS
+CREATE TABLE IF NOT EXISTS public.noticias (
+    id SERIAL PRIMARY KEY,
+    titulo VARCHAR(200) NOT NULL,
+    contenido TEXT NOT NULL,
+    resumen VARCHAR(500),
+    categoria_id INTEGER REFERENCES public.categorias(id),
+    categoria_otra VARCHAR(100),
+    ubicacion VARCHAR(200),
+    latitud DECIMAL(10, 8),
+    longitud DECIMAL(11, 8),
+    evidencia_path VARCHAR(500),
+    estado VARCHAR(20) DEFAULT 'pendiente' CHECK (estado IN ('pendiente', 'en_revision', 'publicada', 'rechazada', 'archivada')),
+    usuario_id INTEGER REFERENCES public.usuarios(id) ON DELETE CASCADE,
+    fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    fecha_publicacion TIMESTAMP,
+    visitas INTEGER DEFAULT 0,
+    revisado_por INTEGER REFERENCES public.usuarios(id),
+    fecha_revision TIMESTAMP,
+    comentarios_revision TEXT,
+    prioridad INTEGER DEFAULT 1 CHECK (prioridad IN (1, 2, 3, 4, 5)),
+    destacada BOOLEAN DEFAULT FALSE,
+    CONSTRAINT uk_titulo UNIQUE (titulo)
+);
+
+-- Índices para noticias
+CREATE INDEX IF NOT EXISTS idx_noticias_estado ON public.noticias(estado);
+CREATE INDEX IF NOT EXISTS idx_noticias_usuario ON public.noticias(usuario_id);
+CREATE INDEX IF NOT EXISTS idx_noticias_fecha ON public.noticias(fecha_creacion);
+CREATE INDEX IF NOT EXISTS idx_noticias_categoria ON public.noticias(categoria_id);
+CREATE INDEX IF NOT EXISTS idx_noticias_prioridad ON public.noticias(prioridad);
+CREATE INDEX IF NOT EXISTS idx_noticias_destacada ON public.noticias(destacada);
+
+-- 5.4 TABLA DE EVIDENCIAS MULTIMEDIA
+CREATE TABLE IF NOT EXISTS public.evidencias (
+    id SERIAL PRIMARY KEY,
+    noticia_id INTEGER REFERENCES public.noticias(id) ON DELETE CASCADE,
+    tipo_evidencia VARCHAR(20) CHECK (tipo_evidencia IN ('imagen', 'video', 'audio', 'documento', 'otro')),
+    nombre_archivo VARCHAR(255),
+    ruta_archivo VARCHAR(500) NOT NULL,
+    tamano_bytes BIGINT,
+    formato VARCHAR(10),
+    descripcion TEXT,
+    fecha_subida TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    usuario_subio INTEGER REFERENCES public.usuarios(id)
+);
+
+-- Índices para evidencias
+CREATE INDEX IF NOT EXISTS idx_evidencias_noticia ON public.evidencias(noticia_id);
+
+-- 5.5 TABLA DE COMENTARIOS
+CREATE TABLE IF NOT EXISTS public.comentarios (
+    id SERIAL PRIMARY KEY,
+    noticia_id INTEGER REFERENCES public.noticias(id) ON DELETE CASCADE,
+    usuario_id INTEGER REFERENCES public.usuarios(id) ON DELETE CASCADE,
+    comentario TEXT NOT NULL,
+    fecha_comentario TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    aprobado BOOLEAN DEFAULT FALSE,
+    reportado INTEGER DEFAULT 0
+);
+
+-- Índices para comentarios
+CREATE INDEX IF NOT EXISTS idx_comentarios_noticia ON public.comentarios(noticia_id);
+CREATE INDEX IF NOT EXISTS idx_comentarios_fecha ON public.comentarios(fecha_comentario);
+
+-- 5.6 TABLA DE AUDITORÍA
+CREATE TABLE IF NOT EXISTS auditoria.log_actividades (
+    id SERIAL PRIMARY KEY,
+    usuario_id INTEGER REFERENCES public.usuarios(id),
+    accion VARCHAR(100),
+    tabla_afectada VARCHAR(50),
+    registro_id INTEGER,
+    datos_anteriores JSONB,
+    datos_nuevos JSONB,
+    ip_origen INET,
+    fecha_hora TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Índices para auditoría
+CREATE INDEX IF NOT EXISTS idx_log_usuario ON auditoria.log_actividades(usuario_id);
+CREATE INDEX IF NOT EXISTS idx_log_fecha ON auditoria.log_actividades(fecha_hora);
+
+-- 5.7 TABLA DE NOTIFICACIONES
+CREATE TABLE IF NOT EXISTS public.notificaciones (
+    id SERIAL PRIMARY KEY,
+    usuario_id INTEGER REFERENCES public.usuarios(id) ON DELETE CASCADE,
+    titulo VARCHAR(200) NOT NULL,
+    mensaje TEXT NOT NULL,
+    tipo VARCHAR(50),
+    leida BOOLEAN DEFAULT FALSE,
+    fecha_envio TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    fecha_lectura TIMESTAMP
+);
+
+-- Índices para notificaciones
+CREATE INDEX IF NOT EXISTS idx_notificaciones_usuario ON public.notificaciones(usuario_id);
+CREATE INDEX IF NOT EXISTS idx_notificaciones_leida ON public.notificaciones(leida);
+
+-- =====================================================
+-- FUNCIONES Y PROCEDIMIENTOS ALMACENADOS
+-- =====================================================
+
+-- Función para registrar actividad en auditoría
+CREATE OR REPLACE FUNCTION auditoria.registrar_actividad()
+RETURNS TRIGGER AS $$
+BEGIN
+    INSERT INTO auditoria.log_actividades (
+        usuario_id,
+        accion,
+        tabla_afectada,
+        registro_id,
+        datos_anteriores,
+        datos_nuevos,
+        ip_origen
+    ) VALUES (
+        current_user_id(),
+        TG_OP,
+        TG_TABLE_NAME,
+        NEW.id,
+        CASE WHEN TG_OP = 'UPDATE' THEN row_to_json(OLD) ELSE NULL END,
+        row_to_json(NEW),
+        inet_client_addr()
+    );
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Función para obtener el usuario actual (se puede implementar en la aplicación)
+CREATE OR REPLACE FUNCTION current_user_id()
+RETURNS INTEGER AS $$
+BEGIN
+    -- Esta función se puede implementar con variables de sesión
+    -- Por ahora retorna NULL
+    RETURN NULL;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Función para incrementar visitas
+CREATE OR REPLACE FUNCTION public.incrementar_visitas()
+RETURNS TRIGGER AS $$
+BEGIN
+    UPDATE public.noticias 
+    SET visitas = visitas + 1 
+    WHERE id = NEW.noticia_id;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+-- =====================================================
+-- TRIGGERS
+-- =====================================================
+
+-- Trigger para auditoría en noticias
+CREATE TRIGGER tr_auditoria_noticias
+    AFTER INSERT OR UPDATE OR DELETE ON public.noticias
+    FOR EACH ROW EXECUTE FUNCTION auditoria.registrar_actividad();
+
+-- Trigger para incrementar visitas en comentarios
+CREATE TRIGGER tr_incrementar_visitas
+    AFTER INSERT ON public.comentarios
+    FOR EACH ROW EXECUTE FUNCTION public.incrementar_visitas();
+
+-- =====================================================
+-- VISTAS PARA REPORTES
+-- =====================================================
+
+-- Vista de estadísticas por categoría
+CREATE OR REPLACE VIEW reportes.vista_estadisticas_categorias AS
+SELECT 
+    c.nombre AS categoria,
+    COUNT(n.id) AS total_noticias,
+    COUNT(CASE WHEN n.estado = 'publicada' THEN 1 END) AS publicadas,
+    COUNT(CASE WHEN n.estado = 'pendiente' THEN 1 END) AS pendientes,
+    COUNT(CASE WHEN n.estado = 'rechazada' THEN 1 END) AS rechazadas,
+    SUM(n.visitas) AS total_visitas
+FROM public.categorias c
+LEFT JOIN public.noticias n ON c.id = n.categoria_id
+GROUP BY c.id, c.nombre
+ORDER BY total_noticias DESC;
+
+-- Vista de noticias destacadas
+CREATE OR REPLACE VIEW reportes.vista_noticias_destacadas AS
+SELECT 
+    n.id,
+    n.titulo,
+    n.resumen,
+    c.nombre AS categoria,
+    n.visitas,
+    n.fecha_publicacion,
+    u.username AS autor
+FROM public.noticias n
+LEFT JOIN public.categorias c ON n.categoria_id = c.id
+LEFT JOIN public.usuarios u ON n.usuario_id = u.id
+WHERE n.destacada = TRUE AND n.estado = 'publicada'
+ORDER BY n.fecha_publicacion DESC;
+
+-- Vista de actividad de usuarios
+CREATE OR REPLACE VIEW reportes.vista_actividad_usuarios AS
+SELECT 
+    u.id,
+    u.username,
+    u.tipo_usuario,
+    COUNT(DISTINCT n.id) AS denuncias_creadas,
+    COUNT(DISTINCT c.id) AS comentarios_realizados,
+    u.fecha_registro,
+    u.fecha_ultimo_login
+FROM public.usuarios u
+LEFT JOIN public.noticias n ON u.id = n.usuario_id
+LEFT JOIN public.comentarios c ON u.id = c.usuario_id
+GROUP BY u.id
+ORDER BY denuncias_creadas DESC;
+
+-- =====================================================
+-- DATOS DE PRUEBA
+-- =====================================================
+
+-- Insertar usuarios administradores (contraseña: admin123)
+INSERT INTO public.usuarios (username, password, email, nombres, apellidos, tipo_usuario, estado) VALUES 
+('admin', '8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918', 'admin@hormiguero.com', 'Administrador', 'Sistema', 'administrador', 'activo'),
+('revisor1', '8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918', 'revisor1@hormiguero.com', 'Juan', 'Pérez', 'revisor', 'activo'),
+('ciudadano1', '8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918', 'ciudadano1@email.com', 'María', 'Gómez', 'ciudadano', 'activo')
+ON CONFLICT (username) DO NOTHING;
+
+-- Insertar denuncias de prueba
+INSERT INTO public.noticias (titulo, contenido, categoria_id, ubicacion, estado, usuario_id, prioridad) VALUES
+('Falta de agua en el barrio La Pola', 
+ 'Los residentes del barrio La Pola llevan 3 días sin servicio de agua potable. La empresa de acueducto no ha dado respuesta a las quejas.', 
+ (SELECT id FROM public.categorias WHERE nombre = 'Servicios Públicos'), 
+ 'Barrio La Pola, Ibagué', 
+ 'publicada', 
+ 3, 
+ 4),
+
+('Posible corrupción en contratación de salud', 
+ 'Se denuncian presuntos sobrecostos en la contratación de servicios de salud para la ESE hospital San Francisco.', 
+ (SELECT id FROM public.categorias WHERE nombre = 'Corrupción'), 
+ 'Centro de Ibagué', 
+ 'pendiente', 
+ 3, 
+ 5),
+
+('Inseguridad en el sector de La Francia', 
+ 'Habitantes del sector denuncian constantes atracos en horas de la noche. Piden mayor presencia policial.', 
+ (SELECT id FROM public.categorias WHERE nombre = 'Inseguridad'), 
+ 'La Francia, Ibagué', 
+ 'pendiente', 
+ 3, 
+ 4),
+
+('Contaminación del río Combeima', 
+ 'Se evidencia vertimiento de aguas residuales sin tratar directamente al río Combeima, afectando el ecosistema.', 
+ (SELECT id FROM public.categorias WHERE nombre = 'Medio Ambiente'), 
+ 'Cuenca del río Combeima', 
+ 'publicada', 
+ 3, 
+ 5),
+
+('Problemas en colegio INEM', 
+ 'Estudiantes denuncian falta de profesores en varias asignaturas desde hace dos meses.', 
+ (SELECT id FROM public.categorias WHERE nombre = 'Educación'), 
+ 'Colegio INEM, Ibagué', 
+ 'en_revision', 
+ 3, 
+ 3)
+ON CONFLICT (titulo) DO NOTHING;
+
+-- Insertar comentarios de prueba
+INSERT INTO public.comentarios (noticia_id, usuario_id, comentario, aprobado) VALUES
+(1, 2, 'Excelente denuncia, esperamos pronta solución.', TRUE),
+(1, 3, 'También afecta al barrio vecino. Apoyamos la denuncia.', TRUE),
+(4, 2, 'Importante denuncia ambiental. Se debe investigar.', TRUE);
+
+-- =====================================================
+-- CONSULTAS DE VERIFICACIÓN
+-- =====================================================
+
+-- Verificar todas las tablas creadas
+SELECT 
+    table_schema,
+    table_name,
+    table_type
+FROM information_schema.tables 
+WHERE table_schema IN ('public', 'auditoria', 'reportes')
+ORDER BY table_schema, table_name;
+
+-- Verificar estadísticas de denuncias
+SELECT 
+    estado,
+    COUNT(*) as total,
+    COUNT(*) * 100.0 / SUM(COUNT(*)) OVER() as porcentaje
+FROM public.noticias
+GROUP BY estado
+ORDER BY total DESC;
+
+-- Verificar usuarios
+SELECT 
+    id,
+    username,
+    email,
+    tipo_usuario,
+    estado,
+    fecha_registro
+FROM public.usuarios;
+
+-- Verificar noticias con sus categorías
+SELECT 
+    n.id,
+    n.titulo,
+    c.nombre as categoria,
+    n.estado,
+    n.visitas,
+    n.fecha_creacion
+FROM public.noticias n
+LEFT JOIN public.categorias c ON n.categoria_id = c.id
+ORDER BY n.fecha_creacion DESC
+LIMIT 10;
+
+-- =====================================================
+-- PERMISOS Y SEGURIDAD
+-- =====================================================
+
+-- Crear roles para la aplicación
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT FROM pg_roles WHERE rolname = 'app_ciudadano') THEN
+        CREATE ROLE app_ciudadano;
+    END IF;
+    
+    IF NOT EXISTS (SELECT FROM pg_roles WHERE rolname = 'app_revisor') THEN
+        CREATE ROLE app_revisor;
+    END IF;
+    
+    IF NOT EXISTS (SELECT FROM pg_roles WHERE rolname = 'app_admin') THEN
+        CREATE ROLE app_admin;
+    END IF;
+END
+$$;
+
+-- Asignar permisos según roles
+GRANT CONNECT ON DATABASE hormiguero_db TO app_ciudadano, app_revisor, app_admin;
+GRANT USAGE ON SCHEMA public TO app_ciudadano, app_revisor, app_admin;
+GRANT USAGE ON SCHEMA reportes TO app_ciudadano, app_revisor, app_admin;
+
+-- Permisos para ciudadanos
+GRANT SELECT ON public.categorias TO app_ciudadano;
+GRANT SELECT, INSERT ON public.noticias TO app_ciudadano;
+GRANT SELECT, INSERT ON public.comentarios TO app_ciudadano;
+GRANT SELECT ON reportes.vista_noticias_destacadas TO app_ciudadano;
+
+-- Permisos para revisores
+GRANT SELECT, INSERT, UPDATE ON public.noticias TO app_revisor;
+GRANT SELECT, INSERT, UPDATE ON public.categorias TO app_revisor;
+GRANT SELECT ON auditoria.log_actividades TO app_revisor;
+GRANT SELECT ON reportes.vista_estadisticas_categorias TO app_revisor;
+GRANT SELECT ON reportes.vista_actividad_usuarios TO app_revisor;
+
+-- Permisos para administradores
+GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO app_admin;
+GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA auditoria TO app_admin;
+GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA reportes TO app_admin;
+GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO app_admin;
+
+-- =====================================================
+-- MENSAJE FINAL
+-- =====================================================
+
+DO $$
+BEGIN
+    RAISE NOTICE '==========================================';
+    RAISE NOTICE 'BASE DE DATOS CREADA EXITOSAMENTE';
+    RAISE NOTICE '==========================================';
+    RAISE NOTICE 'Base de datos: hormiguero_db';
+    RAISE NOTICE 'Esquemas: public, auditoria, reportes';
+    RAISE NOTICE '==========================================';
+    RAISE NOTICE 'CREDENCIALES DE PRUEBA:';
+    RAISE NOTICE 'Administrador: admin / admin123';
+    RAISE NOTICE 'Revisor: revisor1 / admin123';
+    RAISE NOTICE 'Ciudadano: ciudadano1 / admin123';
+    RAISE NOTICE '==========================================';
+END $$;
+
+Instrucciones para ejecutar el script en pgAdmin 4:
+
+    Abre pgAdmin 4
+
+    Conéctate a tu servidor PostgreSQL
+
+    Abre el Query Tool (Tools → Query Tool o haz clic derecho en el servidor → Query Tool)
+
+    Copia y pega TODO el script anterior en el editor
+
+    Ejecuta el script presionando F5 o haciendo clic en el botón "Execute/Refresh"
+
+Características del script:
+Base de datos:
+
+    Nombre: hormiguero_db
+
+    Encoding: UTF8
+
+    Collation: Spanish_Colombia.1252
+
+Esquemas:
+
+    public: Tablas principales del sistema
+
+    auditoria: Logs de actividades
+
+    reportes: Vistas para reportes y estadísticas
+
+Tablas principales:
+
+    usuarios - Gestión de usuarios con roles
+
+    categorias - Categorías predefinidas de denuncias
+
+    noticias - Denuncias y noticias
+
+    evidencias - Archivos multimedia
+
+    comentarios - Comentarios en noticias
+
+    notificaciones - Sistema de notificaciones
+
+    log_actividades - Auditoría del sistema
+
+Funcionalidades incluidas:
+
+    Triggers automáticos para auditoría
+
+    Vistas para reportes estadísticos
+
+    Índices optimizados
+
+    Datos de prueba precargados
+
+    Roles y permisos configurados
+
+Credenciales de prueba:
+
+    Administrador: admin / admin123
+
+    Revisor: revisor1 / admin123
+
+    Ciudadano: ciudadano1 / admin123
