@@ -1,0 +1,40 @@
+<svg width="300" height="200" xmlns="http://www.w3.org/2000/svg">
+  <!-- Fondo rectangular que ocupa todo el ancho y alto del SVG, color gris claro -->
+  <rect width="100%" height="100%" fill="#f0f0f0" />
+
+  <!-- Texto centrado en x=150, y=100, estilo Arial tamaño 20, alineado al medio -->
+  <text x="150" y="100" font-family="Arial" font-size="20" text-anchor="middle" id="miTexto">
+    Haz clic aquí
+  </text>
+
+  <!-- Círculo azul con centro en (150,150) y radio 30 -->
+  <circle cx="150" cy="150" r="30" fill="blue" id="miCirculo" />
+
+  <!-- Script interno con JavaScript para interactividad -->
+  <script type="text/javascript">
+    // <![CDATA[   (necesario en SVG puro para evitar errores de parseo XML)
+
+    // Obtener referencia al elemento texto por su ID
+    var texto = document.getElementById("miTexto");
+    // Obtener referencia al elemento círculo por su ID
+    var circulo = document.getElementById("miCirculo");
+
+    // Agregar evento click al texto
+    texto.addEventListener("click", function() {
+      // Cambiar el contenido del texto a "¡Click!"
+      texto.textContent = "¡Click!";
+      // Cambiar el color del texto a rojo (fill en SVG)
+      texto.setAttribute("fill", "red");
+    });
+
+    // Agregar evento click al círculo
+    circulo.addEventListener("click", function() {
+      // Cambiar el color de relleno del círculo a verde
+      circulo.setAttribute("fill", "green");
+      // Aumentar el radio del círculo a 45
+      circulo.setAttribute("r", "45");
+    });
+
+    // ]]>
+  </script>
+</svg>

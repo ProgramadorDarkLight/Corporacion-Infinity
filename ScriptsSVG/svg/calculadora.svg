@@ -1,0 +1,153 @@
+<svg width="300" height="400" xmlns="http://www.w3.org/2000/svg">
+  <!-- Fondo -->
+  <rect width="100%" height="100%" fill="#333" rx="10" />
+
+  <!-- Pantalla de la calculadora -->
+  <rect x="20" y="20" width="260" height="50" fill="#fff" rx="5" />
+  <text x="270" y="55" font-family="monospace" font-size="24" fill="#000" text-anchor="end" id="pantalla">0</text>
+
+  <!-- Botones -->
+  <!-- Fila 1: 7, 8, 9, / -->
+  <rect x="20" y="90" width="50" height="40" fill="#aaa" rx="5" class="btn" data-val="7" />
+  <text x="45" y="115" font-family="Arial" font-size="20" text-anchor="middle" fill="#000">7</text>
+
+  <rect x="80" y="90" width="50" height="40" fill="#aaa" rx="5" class="btn" data-val="8" />
+  <text x="105" y="115" font-family="Arial" font-size="20" text-anchor="middle" fill="#000">8</text>
+
+  <rect x="140" y="90" width="50" height="40" fill="#aaa" rx="5" class="btn" data-val="9" />
+  <text x="165" y="115" font-family="Arial" font-size="20" text-anchor="middle" fill="#000">9</text>
+
+  <rect x="200" y="90" width="80" height="40" fill="#f90" rx="5" class="op" data-op="/" />
+  <text x="240" y="115" font-family="Arial" font-size="20" text-anchor="middle" fill="#000">÷</text>
+
+  <!-- Fila 2: 4, 5, 6, * -->
+  <rect x="20" y="140" width="50" height="40" fill="#aaa" rx="5" class="btn" data-val="4" />
+  <text x="45" y="165" font-family="Arial" font-size="20" text-anchor="middle" fill="#000">4</text>
+
+  <rect x="80" y="140" width="50" height="40" fill="#aaa" rx="5" class="btn" data-val="5" />
+  <text x="105" y="165" font-family="Arial" font-size="20" text-anchor="middle" fill="#000">5</text>
+
+  <rect x="140" y="140" width="50" height="40" fill="#aaa" rx="5" class="btn" data-val="6" />
+  <text x="165" y="165" font-family="Arial" font-size="20" text-anchor="middle" fill="#000">6</text>
+
+  <rect x="200" y="140" width="80" height="40" fill="#f90" rx="5" class="op" data-op="*" />
+  <text x="240" y="165" font-family="Arial" font-size="20" text-anchor="middle" fill="#000">×</text>
+
+  <!-- Fila 3: 1, 2, 3, - -->
+  <rect x="20" y="190" width="50" height="40" fill="#aaa" rx="5" class="btn" data-val="1" />
+  <text x="45" y="215" font-family="Arial" font-size="20" text-anchor="middle" fill="#000">1</text>
+
+  <rect x="80" y="190" width="50" height="40" fill="#aaa" rx="5" class="btn" data-val="2" />
+  <text x="105" y="215" font-family="Arial" font-size="20" text-anchor="middle" fill="#000">2</text>
+
+  <rect x="140" y="190" width="50" height="40" fill="#aaa" rx="5" class="btn" data-val="3" />
+  <text x="165" y="215" font-family="Arial" font-size="20" text-anchor="middle" fill="#000">3</text>
+
+  <rect x="200" y="190" width="80" height="40" fill="#f90" rx="5" class="op" data-op="-" />
+  <text x="240" y="215" font-family="Arial" font-size="20" text-anchor="middle" fill="#000">-</text>
+
+  <!-- Fila 4: 0, C, =, + -->
+  <rect x="20" y="240" width="110" height="40" fill="#aaa" rx="5" id="btn0" data-val="0" />
+  <text x="75" y="265" font-family="Arial" font-size="20" text-anchor="middle" fill="#000">0</text>
+
+  <rect x="140" y="240" width="50" height="40" fill="#d66" rx="5" id="btnC" />
+  <text x="165" y="265" font-family="Arial" font-size="20" text-anchor="middle" fill="#000">C</text>
+
+  <rect x="200" y="240" width="80" height="40" fill="#6d6" rx="5" id="btnIgual" />
+  <text x="240" y="265" font-family="Arial" font-size="20" text-anchor="middle" fill="#000">=</text>
+
+  <rect x="200" y="290" width="80" height="40" fill="#f90" rx="5" class="op" data-op="+" />
+  <text x="240" y="315" font-family="Arial" font-size="20" text-anchor="middle" fill="#000">+</text>
+
+  <!-- Script de la calculadora -->
+  <script type="text/javascript">
+    <![CDATA[
+
+      var pantalla = document.getElementById("pantalla");
+      var valorActual = "0";
+      var operador = null;
+      var valorAnterior = null;
+
+      function actualizarPantalla() {
+        pantalla.textContent = valorActual;
+      }
+
+      function agregarDigito(digito) {
+        if (valorActual === "0") {
+          valorActual = digito;
+        } else {
+          valorActual += digito;
+        }
+        actualizarPantalla();
+      }
+
+      function limpiar() {
+        valorActual = "0";
+        operador = null;
+        valorAnterior = null;
+        actualizarPantalla();
+      }
+
+      function setOperador(op) {
+        if (operador !== null) {
+          calcular();
+        }
+        valorAnterior = valorActual;
+        operador = op;
+        valorActual = "0";
+      }
+
+      function calcular() {
+        if (operador === null || valorAnterior === null) return;
+        var a = parseFloat(valorAnterior);
+        var b = parseFloat(valorActual);
+        var resultado = 0;
+
+        switch (operador) {
+          case "+": resultado = a + b; break;
+          case "-": resultado = a - b; break;
+          case "*": resultado = a * b; break;
+          case "/": resultado = b !== 0 ? a / b : "Error"; break;
+        }
+
+        if (resultado === "Error") {
+          valorActual = "Error";
+        } else {
+          valorActual = resultado.toString();
+        }
+        operador = null;
+        valorAnterior = null;
+        actualizarPantalla();
+      }
+
+      // Asignar eventos a los números (por clase btn)
+      var botonesNum = document.querySelectorAll(".btn");
+      for (var i = 0; i < botonesNum.length; i++) {
+        botonesNum[i].addEventListener("click", function() {
+          var val = this.getAttribute("data-val");
+          if (val) agregarDigito(val);
+        });
+      }
+
+      // Botón 0 especial (no tiene clase btn pero sí data-val)
+      document.getElementById("btn0").addEventListener("click", function() {
+        agregarDigito("0");
+      });
+
+      // Botones de operadores
+      var ops = document.querySelectorAll(".op");
+      for (var i = 0; i < ops.length; i++) {
+        ops[i].addEventListener("click", function() {
+          var op = this.getAttribute("data-op");
+          setOperador(op);
+        });
+      }
+
+      // Botón C (clear)
+      document.getElementById("btnC").addEventListener("click", limpiar);
+
+      // Botón igual
+      document.getElementById("btnIgual").addEventListener("click", calcular);
+    ]]>
+  </script>
+</svg>
