@@ -12,9 +12,9 @@ CORS(app)
 
 # Configuración de la base de datos
 DB_CONFIG = {
-    'dbname': 'sistema_app',
-    'user': 'postgres',  # Cambia según tu usuario
-    'password': 'tu_contraseña',  # Cambia según tu contraseña
+    'dbname': 'sistema_app_denuncias',
+    'user': 'DarkLight',  # Cambia según tu usuario
+    'password': 'Zeus9119',  # Cambia según tu contraseña
     'host': 'localhost',
     'port': '5432'
 }
@@ -25,13 +25,17 @@ def get_db_connection():
 # ==================== RUTAS PRINCIPALES ====================
 
 @app.route('/')
+
 def index():
+
     return render_template('index.html')
 
 # ==================== AUTENTICACIÓN ====================
 
 @app.route('/api/login', methods=['POST'])
+
 def login():
+    
     data = request.json
     username = data.get('username')
     password = data.get('password')

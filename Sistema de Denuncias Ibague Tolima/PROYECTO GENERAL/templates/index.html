@@ -17,7 +17,6 @@
             min-height: 100vh;
         }
         
-        /* Header */
         .header {
             background: white;
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
@@ -79,7 +78,6 @@
             cursor: pointer;
         }
         
-        /* Navegación */
         .nav-tabs {
             background: white;
             padding: 0 30px;
@@ -106,7 +104,6 @@
             border-bottom: 2px solid #667eea;
         }
         
-        /* Contenido principal */
         .container {
             max-width: 1400px;
             margin: 20px auto;
@@ -127,7 +124,6 @@
             to { opacity: 1; transform: translateY(0); }
         }
         
-        /* Tarjetas de estadísticas */
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -155,7 +151,6 @@
             color: #667eea;
         }
         
-        /* Tablas */
         .table-container {
             background: white;
             border-radius: 10px;
@@ -184,7 +179,6 @@
             background: #f5f5f5;
         }
         
-        /* Formularios */
         .form-card {
             background: white;
             border-radius: 10px;
@@ -256,7 +250,6 @@
             margin: 2px;
         }
         
-        /* Modal */
         .modal {
             display: none;
             position: fixed;
@@ -296,7 +289,6 @@
             font-size: 24px;
         }
         
-        /* Badges */
         .badge {
             padding: 4px 8px;
             border-radius: 4px;
@@ -319,42 +311,28 @@
             color: #9c4221;
         }
         
-        /* Responsive */
         @media (max-width: 768px) {
             .header {
                 flex-direction: column;
                 gap: 10px;
             }
-            
             .nav-tabs {
                 overflow-x: auto;
             }
-            
             th, td {
                 font-size: 12px;
                 padding: 8px;
             }
         }
         
-        /* SVG Container */
-        .svg-container {
-            background: white;
-            border-radius: 10px;
-            padding: 20px;
-            margin-top: 20px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-        
-        svg {
-            width: 100%;
-            height: auto;
-            background: #f5f5f5;
-            border-radius: 8px;
+        .error-message {
+            color: #f56565;
+            font-size: 12px;
+            margin-top: 5px;
         }
     </style>
 </head>
 <body>
-    <!-- Header -->
     <div class="header">
         <div class="logo">
             <h1>🏢 Sistema Integral</h1>
@@ -375,43 +353,31 @@
         </div>
     </div>
     
-    <!-- Navegación -->
     <div class="nav-tabs">
         <button class="nav-tab active" onclick="showTab('dashboard')">📊 Dashboard</button>
         <button class="nav-tab" onclick="showTab('inventario')">📦 Inventario</button>
         <button class="nav-tab" onclick="showTab('movimientos')">🔄 Movimientos</button>
         <button class="nav-tab" onclick="showTab('denuncias')">📢 Denuncias</button>
-        <button class="nav-tab" onclick="showTab('svg-grafico')">📈 Gráfico SVG</button>
     </div>
     
-    <!-- Contenido -->
     <div class="container">
-        <!-- Dashboard -->
         <div id="dashboard" class="tab-content active">
             <div class="stats-grid" id="statsGrid">
-                <!-- Se llena con JS -->
+                <div class="stat-card"><h3>Cargando...</h3><div class="number">-</div></div>
             </div>
-            
             <div class="form-card">
                 <h3>📌 Bienvenido al Sistema Integral</h3>
                 <p>Este sistema combina la gestión de inventario con un sistema de denuncias ciudadanas.</p>
-                <ul style="margin-top: 10px; margin-left: 20px;">
-                    <li>📦 Gestión completa de productos y stock</li>
-                    <li>🔄 Registro de movimientos de inventario</li>
-                    <li>📢 Denuncias ciudadanas con seguimiento</li>
-                    <li>📊 Dashboard con estadísticas en tiempo real</li>
-                    <li>📈 Visualización SVG interactiva</li>
-                </ul>
             </div>
         </div>
         
-        <!-- Inventario -->
         <div id="inventario" class="tab-content">
             <div class="form-card">
                 <h3>➕ Nuevo Producto</h3>
                 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px;">
                     <input type="text" id="prodCodigo" placeholder="Código" />
                     <input type="text" id="prodNombre" placeholder="Nombre" />
+                    <input type="text" id="prodDescripcion" placeholder="Descripción" />
                     <select id="prodCategoria">
                         <option value="">Categoría</option>
                         <option>Electrónica</option>
@@ -426,18 +392,14 @@
                     <button class="btn-primary" onclick="crearProducto()">Guardar Producto</button>
                 </div>
             </div>
-            
             <div class="table-container">
                 <table>
-                    <thead>
-                        <tr><th>Código</th><th>Nombre</th><th>Categoría</th><th>Stock</th><th>Precio Venta</th><th>Acciones</th></tr>
-                    </thead>
+                    <thead><tr><th>Código</th><th>Nombre</th><th>Categoría</th><th>Stock</th><th>Precio Venta</th><th>Acciones</th></tr></thead>
                     <tbody id="productosTable"></tbody>
                 </table>
             </div>
         </div>
         
-        <!-- Movimientos -->
         <div id="movimientos" class="tab-content">
             <div class="form-card">
                 <h3>🔄 Registrar Movimiento</h3>
@@ -454,7 +416,6 @@
                     <button class="btn-primary" onclick="registrarMovimiento()">Registrar</button>
                 </div>
             </div>
-            
             <div class="table-container">
                 <h3 style="padding: 15px;">📜 Historial de Movimientos</h3>
                 <table>
@@ -464,7 +425,6 @@
             </div>
         </div>
         
-        <!-- Denuncias -->
         <div id="denuncias" class="tab-content">
             <div class="form-card">
                 <h3>📝 Nueva Denuncia</h3>
@@ -501,12 +461,378 @@
                 </table>
             </div>
         </div>
+    </div>
+    
+    <div id="registerModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Registro de Usuario</h3>
+                <span class="close-modal" onclick="closeRegisterModal()">&times;</span>
+            </div>
+            <div class="form-group">
+                <label>Usuario</label>
+                <input type="text" id="regUser" />
+            </div>
+            <div class="form-group">
+                <label>Email</label>
+                <input type="email" id="regEmail" />
+            </div>
+            <div class="form-group">
+                <label>Contraseña</label>
+                <input type="password" id="regPass" />
+            </div>
+            <button class="btn-primary" onclick="registrarse()">Registrarse</button>
+            <div id="registerError" class="error-message"></div>
+        </div>
+    </div>
+
+
+    
+    <script>
+        let currentUser = null;
         
-        <!-- SVG Gráfico -->
-        <div id="svg-grafico" class="tab-content">
-            <div class="svg-container">
-                <svg width="100%" height="400" viewBox="0 0 800 400" xmlns="http://www.w3.org/2000/svg">
-                    <rect width="800" height="400" fill="#f8f9fa" rx="10"/>
-                    
-                    <!-- Título -->
-                    <text x="400" y="40" font-family="Arial" font-size="18" font
+        document.addEventListener('DOMContentLoaded', async () => {
+            await checkSession();
+        });
+        
+        async function checkSession() {
+            try {
+                const response = await fetch('/api/session');
+                const data = await response.json();
+                if (data.logged_in) {
+                    currentUser = { username: data.username, rol: data.rol };
+                    document.getElementById('loginForm').style.display = 'none';
+                    document.getElementById('userInfo').style.display = 'flex';
+                    document.getElementById('usernameDisplay').innerText = data.username;
+                    document.getElementById('rolDisplay').innerText = data.rol;
+                    await cargarDashboard();
+                    await cargarProductos();
+                    await cargarDenuncias('todos');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+        
+        async function login() {
+            const username = document.getElementById('loginUser').value;
+            const password = document.getElementById('loginPass').value;
+            
+            if (!username || !password) {
+                alert('Ingrese usuario y contraseña');
+                return;
+            }
+            
+            try {
+                const response = await fetch('/api/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                });
+                const data = await response.json();
+                
+                if (data.success) {
+                    currentUser = data.user;
+                    document.getElementById('loginForm').style.display = 'none';
+                    document.getElementById('userInfo').style.display = 'flex';
+                    document.getElementById('usernameDisplay').innerText = data.user.username;
+                    document.getElementById('rolDisplay').innerText = data.user.rol;
+                    await cargarDashboard();
+                    await cargarProductos();
+                    await cargarDenuncias('todos');
+                    showTab('dashboard');
+                } else {
+                    alert(data.message || 'Error al iniciar sesión');
+                }
+            } catch (error) {
+                alert('Error de conexión con el servidor');
+            }
+        }
+        
+        async function logout() {
+            await fetch('/api/logout', { method: 'POST' });
+            location.reload();
+        }
+        
+        function showTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.getElementById(tabId).classList.add('active');
+            
+            document.querySelectorAll('.nav-tab').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            if (tabId === 'dashboard') cargarDashboard();
+            if (tabId === 'movimientos' && document.getElementById('movProducto').value) cargarMovimientos();
+        }
+        
+        async function cargarDashboard() {
+            try {
+                const response = await fetch('/api/dashboard');
+                const data = await response.json();
+                document.getElementById('statsGrid').innerHTML = `
+                    <div class="stat-card"><h3>Total Productos</h3><div class="number">${data.inventario?.total_productos || 0}</div></div>
+                    <div class="stat-card"><h3>Stock Total</h3><div class="number">${data.inventario?.stock_total || 0}</div></div>
+                    <div class="stat-card"><h3>Productos con Bajo Stock</h3><div class="number">${data.bajo_stock?.bajo_stock || 0}</div></div>
+                    <div class="stat-card"><h3>Total Denuncias</h3><div class="number">${data.denuncias?.total_denuncias || 0}</div></div>
+                    <div class="stat-card"><h3>Denuncias Pendientes</h3><div class="number">${data.denuncias?.pendientes || 0}</div></div>
+                `;
+            } catch (error) {
+                console.error('Error cargando dashboard:', error);
+            }
+        }
+        
+        async function cargarProductos() {
+            try {
+                const response = await fetch('/api/productos');
+                const productos = await response.json();
+                const tbody = document.getElementById('productosTable');
+                tbody.innerHTML = productos.map(p => `
+                    <tr>
+                        <td>${p.codigo}</td>
+                        <td>${p.nombre}</td>
+                        <td>${p.categoria || '-'}</td>
+                        <td>${p.stock_actual}</td>
+                        <td>$${p.precio_venta}</td>
+                        <td><button class="btn btn-sm btn-danger" onclick="eliminarProducto(${p.id})">Eliminar</button></td>
+                    </tr>
+                `).join('');
+                
+                const select = document.getElementById('movProducto');
+                if (select) {
+                    select.innerHTML = productos.map(p => `<option value="${p.id}" data-stock="${p.stock_actual}">${p.nombre} (Stock: ${p.stock_actual})</option>`).join('');
+                }
+            } catch (error) {
+                console.error('Error cargando productos:', error);
+            }
+        }
+        
+        async function crearProducto() {
+            const producto = {
+                codigo: document.getElementById('prodCodigo').value,
+                nombre: document.getElementById('prodNombre').value,
+                descripcion: document.getElementById('prodDescripcion').value,
+                categoria: document.getElementById('prodCategoria').value,
+                precio_compra: parseFloat(document.getElementById('prodPrecioCompra').value) || 0,
+                precio_venta: parseFloat(document.getElementById('prodPrecioVenta').value) || 0,
+                stock_actual: parseInt(document.getElementById('prodStock').value) || 0,
+                stock_minimo: parseInt(document.getElementById('prodStockMin').value) || 5
+            };
+            
+            try {
+                const response = await fetch('/api/productos', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(producto)
+                });
+                const data = await response.json();
+                if (data.success) {
+                    alert('Producto creado exitosamente');
+                    cargarProductos();
+                    cargarDashboard();
+                } else {
+                    alert('Error: ' + data.message);
+                }
+            } catch (error) {
+                alert('Error al crear producto');
+            }
+        }
+        
+        async function eliminarProducto(id) {
+            if (!confirm('¿Eliminar este producto?')) return;
+            try {
+                const response = await fetch(`/api/productos/${id}`, { method: 'DELETE' });
+                const data = await response.json();
+                if (data.success) {
+                    cargarProductos();
+                    cargarDashboard();
+                }
+            } catch (error) {
+                alert('Error al eliminar');
+            }
+        }
+        
+        function cargarStockActual() {
+            const select = document.getElementById('movProducto');
+            const selected = select.options[select.selectedIndex];
+            const stockText = selected.text.match(/Stock: (\d+)/);
+            if (stockText) {
+                document.getElementById('stockActualDisplay').innerHTML = `Stock: ${stockText[1]}`;
+            }
+        }
+        
+        async function registrarMovimiento() {
+            const movimiento = {
+                producto_id: parseInt(document.getElementById('movProducto').value),
+                tipo: document.getElementById('movTipo').value,
+                cantidad: parseInt(document.getElementById('movCantidad').value),
+                motivo: document.getElementById('movMotivo').value
+            };
+            
+            if (!movimiento.cantidad || movimiento.cantidad <= 0) {
+                alert('Ingrese una cantidad válida');
+                return;
+            }
+            
+            try {
+                const response = await fetch('/api/movimientos', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(movimiento)
+                });
+                const data = await response.json();
+                if (data.success) {
+                    alert('Movimiento registrado');
+                    cargarProductos();
+                    cargarMovimientos();
+                    cargarDashboard();
+                    document.getElementById('movCantidad').value = '';
+                    document.getElementById('movMotivo').value = '';
+                } else {
+                    alert('Error: ' + data.message);
+                }
+            } catch (error) {
+                alert('Error al registrar movimiento');
+            }
+        }
+        
+        async function cargarMovimientos() {
+            const productoId = document.getElementById('movProducto').value;
+            if (!productoId) return;
+            
+            try {
+                const response = await fetch(`/api/movimientos/${productoId}`);
+                const movimientos = await response.json();
+                const tbody = document.getElementById('movimientosTable');
+                tbody.innerHTML = movimientos.map(m => `
+                    <tr>
+                        <td>${new Date(m.fecha_movimiento).toLocaleString()}</td>
+                        <td>${m.producto_id}</td>
+                        <td>${m.tipo_movimiento}</td>
+                        <td>${m.cantidad}</td>
+                        <td>${m.stock_anterior}</td>
+                        <td>${m.stock_nuevo}</td>
+                        <td>${m.username || '-'}</td>
+                    </tr>
+                `).join('');
+            } catch (error) {
+                console.error('Error cargando movimientos:', error);
+            }
+        }
+        
+        async function cargarDenuncias(estado) {
+            try {
+                const url = estado === 'todos' ? '/api/denuncias' : `/api/denuncias?estado=${estado}`;
+                const response = await fetch(url);
+                const denuncias = await response.json();
+                const tbody = document.getElementById('denunciasTable');
+                tbody.innerHTML = denuncias.map(d => `
+                    <tr>
+                        <td>${d.id}</td>
+                        <td>${d.titulo}</td>
+                        <td>${d.categoria || '-'}</td>
+                        <td><span class="badge badge-${d.estado}">${d.estado}</span></td>
+                        <td>${new Date(d.fecha_denuncia).toLocaleDateString()}</td>
+                        <td>${d.username || '-'}</td>
+                        <td>
+                            <button class="btn btn-sm btn-success" onclick="cambiarEstadoDenuncia(${d.id}, 'aprobada')">Aprobar</button>
+                            <button class="btn btn-sm btn-danger" onclick="cambiarEstadoDenuncia(${d.id}, 'rechazada')">Rechazar</button>
+                        </td>
+                    </tr>
+                `).join('');
+            } catch (error) {
+                console.error('Error cargando denuncias:', error);
+            }
+        }
+        
+        async function crearDenuncia() {
+            const denuncia = {
+                titulo: document.getElementById('denTitulo').value,
+                contenido: document.getElementById('denContenido').value,
+                categoria: document.getElementById('denCategoria').value,
+                ubicacion: document.getElementById('denUbicacion').value,
+                evidencia_url: document.getElementById('denEvidencia').value
+            };
+            
+            if (!denuncia.titulo || !denuncia.contenido) {
+                alert('Complete título y contenido de la denuncia');
+                return;
+            }
+            
+            try {
+                const response = await fetch('/api/denuncias', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(denuncia)
+                });
+                const data = await response.json();
+                if (data.success) {
+                    alert('Denuncia creada exitosamente');
+                    cargarDenuncias('todos');
+                    cargarDashboard();
+                } else {
+                    alert('Error: ' + data.message);
+                }
+            } catch (error) {
+                alert('Error al crear denuncia');
+            }
+        }
+        
+        async function cambiarEstadoDenuncia(id, estado) {
+            try {
+                const response = await fetch(`/api/denuncias/${id}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ estado, resolucion: 'Procesado por el sistema' })
+                });
+                const data = await response.json();
+                if (data.success) {
+                    cargarDenuncias('todos');
+                    cargarDashboard();
+                }
+            } catch (error) {
+                alert('Error al cambiar estado');
+            }
+        }
+        
+        function showRegisterModal() {
+            document.getElementById('registerModal').classList.add('active');
+        }
+        
+        function closeRegisterModal() {
+            document.getElementById('registerModal').classList.remove('active');
+        }
+        
+        async function registrarse() {
+            const user = document.getElementById('regUser').value;
+            const email = document.getElementById('regEmail').value;
+            const pass = document.getElementById('regPass').value;
+            
+            if (!user || !email || !pass) {
+                document.getElementById('registerError').innerText = 'Complete todos los campos';
+                return;
+            }
+            
+            try {
+                const response = await fetch('/api/registro', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username: user, email, password: pass })
+                });
+                const data = await response.json();
+                if (data.success) {
+                    alert('Registro exitoso, ahora puede iniciar sesión');
+                    closeRegisterModal();
+                } else {
+                    document.getElementById('registerError').innerText = data.message;
+                }
+            } catch (error) {
+                document.getElementById('registerError').innerText = 'Error de conexión';
+            }
+        }
+    </script>
+</body>
+</html>
