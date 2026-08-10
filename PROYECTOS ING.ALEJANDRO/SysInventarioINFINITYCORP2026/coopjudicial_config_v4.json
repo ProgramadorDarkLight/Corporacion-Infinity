@@ -1,0 +1,12 @@
+{
+  "tasa_interes_ahorro": 0.02,
+  "tasa_interes_credito": 0.12,
+  "cuota_afiliacion": 50000,
+  "aportes_minimos": 10000,
+  "dias_gracia": 5,
+  "retencion_fuente": 0.04,
+  "max_cuotas_credito": 36,
+  "monto_min_credito": 500000,
+  "seguro_credito": 0.001,
+  "comision_desembolso": 0.005
+}

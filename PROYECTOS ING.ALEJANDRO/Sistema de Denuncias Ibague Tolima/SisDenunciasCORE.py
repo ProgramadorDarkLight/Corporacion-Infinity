@@ -4,27 +4,52 @@ import psycopg2
 from datetime import datetime
 import hashlib
 
-# Conexión a la base de datos PostgreSQL
+# ============================================
+# FUNCIÓN PARA CENTRAR VENTANAS (CORREGIDA)
+# ============================================
+def centrar_ventana(ventana):
+    """Centrar cualquier ventana (Tk o Toplevel) en la pantalla"""
+    ventana.update_idletasks()
+    ancho = ventana.winfo_width()
+    alto = ventana.winfo_height()
+    x = (ventana.winfo_screenwidth() // 2) - (ancho // 2)
+    y = (ventana.winfo_screenheight() // 2) - (alto // 2)
+    ventana.geometry(f'{ancho}x{alto}+{x}+{y}')
+
+# ============================================
+# CONEXIÓN A LA BASE DE DATOS (CORREGIDA)
+# ============================================
 class ConexionDB:
     def __init__(self, dbname="hormiguero_db", user="DarkLight", password="Zeus9119*", host="localhost", port="5432"):
+        self.conn = None
+        self.cur = None
+        
         try:
+            print(f"🔌 Conectando a {host}:{port} como {user}...")
             self.conn = psycopg2.connect(
-                dbname=dbname, 
-                user=user, 
-                password=password, 
-                host=host, 
-                port=port
+                dbname=dbname,
+                user=user,
+                password=password,
+                host=host,
+                port=port,
+                connect_timeout=5
             )
             self.cur = self.conn.cursor()
             self.crear_tablas()
-            print("Conexión a la base de datos establecida")
+            print("✅ Conexión a la base de datos establecida")
+            
         except Exception as e:
-            print(f"Error al conectar a la base de datos: {e}")
+            print(f"❌ Error al conectar a la base de datos: {e}")
             self.conn = None
             self.cur = None
 
     def crear_tablas(self):
         """Crear las tablas necesarias si no existen"""
+        # 🔴 VERIFICAR QUE HAY CONEXIÓN
+        if self.cur is None:
+            print("⚠️ No hay conexión a la base de datos")
+            return
+            
         try:
             # Tabla de usuarios
             self.cur.execute("""
@@ -90,31 +115,35 @@ class ConexionDB:
                 """, ("admin", password_hash, "admin@hormiguero.com", "revisor"))
             
             self.conn.commit()
-            print("Tablas creadas/verificadas exitosamente")
+            print("✅ Tablas creadas/verificadas exitosamente")
             
         except Exception as e:
-            print(f"Error al crear tablas: {e}")
-            self.conn.rollback()
+            print(f"❌ Error al crear tablas: {e}")
+            if self.conn:
+                self.conn.rollback()
 
     def close(self):
         if self.conn:
             self.conn.close()
+            print("🔌 Conexión cerrada")
 
-# Ventana de Login
+# ============================================
+# VENTANA DE LOGIN (CORREGIDA)
+# ============================================
 class LoginWindow:
     def __init__(self):
         self.ventana = tk.Tk()
-        self.ventana.title("El Hormiguero Ibagué - Sistema de Denuncias")
-        self.ventana.geometry("400x350") # Un poco más alta por los botones
-        
-        # Centrar la ventana
-        self.ventana.eval('tk::PlaceWindow . center')
-        
-        # Estilo
+        self.ventana.title("Infinity Corp \u221E - Sistema de Denuncias")
+        self.ventana.geometry("400x350")
         self.ventana.configure(bg='#f0f0f0')
+
+        
+        
+        # ✅ CENTRAR VENTANA (CORREGIDO)
+        centrar_ventana(self.ventana)
         
         # Título
-        titulo = tk.Label(self.ventana, text="El Hormiguero Ibagué", 
+        titulo = tk.Label(self.ventana, text="  Sistema de Denuncias", 
                          font=("Arial", 16, "bold"), bg='#f0f0f0', fg='#333')
         titulo.pack(pady=20)
         
@@ -149,21 +178,22 @@ class LoginWindow:
         self.db = ConexionDB()
 
     def login(self):
-        # 1. Obtener y limpiar datos
         username = self.entry_usuario.get().strip()
         password = self.entry_password.get().strip()
         
         if not username or not password:
             messagebox.showwarning("Atención", "Por favor, ingrese usuario y contraseña")
             return
-
-        # 2. Generar hash
-        password_hash = hashlib.sha256(password.encode()).hexdigest()
         
+        # 🔴 VERIFICAR CONEXIÓN
+        if self.db.cur is None:
+            messagebox.showerror("Error", "No hay conexión a la base de datos.\nVerifique que PostgreSQL esté ejecutándose.")
+            return
+
+        password_hash = hashlib.sha256(password.encode()).hexdigest()
         print(f"--- Intento de Login: {username} ---")
 
         try:
-            # 3. Consulta a la base de datos
             self.db.cur.execute("""
                 SELECT id, username, tipo_usuario 
                 FROM usuarios 
@@ -173,19 +203,19 @@ class LoginWindow:
             usuario = self.db.cur.fetchone()
             
             if usuario:
-                print(f"Acceso concedido: {usuario[1]} ({usuario[2]})")
-                self.ventana.destroy() 
+                print(f"✅ Acceso concedido: {usuario[1]} ({usuario[2]})")
+                self.ventana.destroy()
                 
                 if usuario[2] == 'revisor':
                     RevisorWindow(usuario[0], usuario[1])
                 else:
                     CiudadanoWindow(usuario[0], usuario[1])
             else:
-                print("Acceso denegado: Credenciales incorrectas.")
+                print("❌ Acceso denegado: Credenciales incorrectas.")
                 messagebox.showerror("Error", "Usuario o contraseña incorrectos")
                 
         except Exception as e:
-            print(f"Error en login: {e}")
+            print(f"❌ Error en login: {e}")
             messagebox.showerror("Error", f"Error al conectar con la base de datos: {e}")
 
     def registro(self):
@@ -194,7 +224,9 @@ class LoginWindow:
     def run(self):
         self.ventana.mainloop()
 
-# Ventana de Registro
+# ============================================
+# VENTANA DE REGISTRO (CORREGIDA)
+# ============================================
 class RegistroWindow:
     def __init__(self, db):
         self.db = db
@@ -202,8 +234,8 @@ class RegistroWindow:
         self.ventana.title("Registro de Ciudadano")
         self.ventana.geometry("400x350")
         
-        # Centrar ventana
-        self.ventana.eval('tk::PlaceWindow . center')
+        # ✅ CENTRAR VENTANA (CORREGIDO)
+        centrar_ventana(self.ventana)
         
         # Campos
         tk.Label(self.ventana, text="Registro de Usuario", font=("Arial", 14, "bold")).pack(pady=10)
@@ -232,10 +264,15 @@ class RegistroWindow:
         btn_registrar.pack(pady=10)
         
     def registrar(self):
-        usuario = self.entry_usuario.get()
-        email = self.entry_email.get()
-        password = self.entry_password.get()
-        confirm = self.entry_confirm.get()
+        # 🔴 VERIFICAR CONEXIÓN
+        if self.db.cur is None:
+            messagebox.showerror("Error", "No hay conexión a la base de datos")
+            return
+            
+        usuario = self.entry_usuario.get().strip()
+        email = self.entry_email.get().strip()
+        password = self.entry_password.get().strip()
+        confirm = self.entry_confirm.get().strip()
         
         if not usuario or not email or not password:
             messagebox.showerror("Error", "Todos los campos son obligatorios")
@@ -260,14 +297,20 @@ class RegistroWindow:
         except Exception as e:
             messagebox.showerror("Error", f"No se pudo registrar: {e}")
 
-# Ventana para Ciudadanos (Denunciantes)
+# ============================================
+# VENTANA PARA CIUDADANOS (CORREGIDA)
+# ============================================
 class CiudadanoWindow:
     def __init__(self, usuario_id, username):
         self.usuario_id = usuario_id
         self.username = username
+    
         self.ventana = tk.Tk()
         self.ventana.title(f"El Hormiguero Ibagué - Bienvenido {username}")
         self.ventana.geometry("800x600")
+        
+        # ✅ CENTRAR VENTANA
+        centrar_ventana(self.ventana)
         
         self.db = ConexionDB()
         self.crear_interfaz()
@@ -350,11 +393,16 @@ class CiudadanoWindow:
             self.entry_evidencia.insert(0, archivo)
     
     def enviar_denuncia(self):
-        titulo = self.entry_titulo.get()
+        # 🔴 VERIFICAR CONEXIÓN
+        if self.db.cur is None:
+            messagebox.showerror("Error", "No hay conexión a la base de datos")
+            return
+            
+        titulo = self.entry_titulo.get().strip()
         contenido = self.text_contenido.get("1.0", tk.END).strip()
         categoria = self.combo_categoria.get()
-        ubicacion = self.entry_ubicacion.get()
-        evidencia = self.entry_evidencia.get()
+        ubicacion = self.entry_ubicacion.get().strip()
+        evidencia = self.entry_evidencia.get().strip()
         
         if not titulo or not contenido:
             messagebox.showerror("Error", "Título y contenido son obligatorios")
@@ -406,6 +454,10 @@ class CiudadanoWindow:
         btn_ver.pack(pady=5)
     
     def cargar_mis_noticias(self):
+        # 🔴 VERIFICAR CONEXIÓN
+        if self.db.cur is None:
+            return
+            
         # Limpiar treeview
         for item in self.tree_mis.get_children():
             self.tree_mis.delete(item)
@@ -440,7 +492,9 @@ class CiudadanoWindow:
         self.ventana.destroy()
         LoginWindow().run()
 
-# Ventana para Revisores (Editores)
+# ============================================
+# VENTANA PARA REVISORES (CORREGIDA)
+# ============================================
 class RevisorWindow:
     def __init__(self, usuario_id, username):
         self.usuario_id = usuario_id
@@ -449,9 +503,13 @@ class RevisorWindow:
         self.ventana.title(f"El Hormiguero Ibagué - Panel de Revisor - {username}")
         self.ventana.geometry("1000x700")
         
+        # ✅ CENTRAR VENTANA
+        centrar_ventana(self.ventana)
+        
         self.db = ConexionDB()
         self.crear_interfaz()
         self.cargar_noticias_pendientes()
+        self.cargar_noticias_publicadas()
         
     def crear_interfaz(self):
         # Menú superior
@@ -533,11 +591,12 @@ class RevisorWindow:
         # Botones
         btn_ver = tk.Button(self.tab_publicadas, text="Ver Detalles", command=self.ver_noticia_publicada)
         btn_ver.pack(pady=5)
-        
-        # Cargar publicadas
-        self.cargar_noticias_publicadas()
     
     def cargar_noticias_pendientes(self):
+        # 🔴 VERIFICAR CONEXIÓN
+        if self.db.cur is None:
+            return
+            
         # Limpiar treeview
         for item in self.tree_pendientes.get_children():
             self.tree_pendientes.delete(item)
@@ -559,6 +618,10 @@ class RevisorWindow:
             print(f"Error al cargar noticias pendientes: {e}")
     
     def cargar_noticias_publicadas(self):
+        # 🔴 VERIFICAR CONEXIÓN
+        if self.db.cur is None:
+            return
+            
         for item in self.tree_publicadas.get_children():
             self.tree_publicadas.delete(item)
         
@@ -589,6 +652,11 @@ class RevisorWindow:
         RevisarNoticiaWindow(self.db, noticia_id, self.usuario_id, self)
     
     def publicar_noticia(self):
+        # 🔴 VERIFICAR CONEXIÓN
+        if self.db.cur is None:
+            messagebox.showerror("Error", "No hay conexión a la base de datos")
+            return
+            
         seleccion = self.tree_pendientes.selection()
         if not seleccion:
             messagebox.showwarning("Advertencia", "Seleccione una noticia para publicar")
@@ -615,6 +683,11 @@ class RevisorWindow:
             messagebox.showerror("Error", f"No se pudo publicar la noticia: {e}")
     
     def rechazar_noticia(self):
+        # 🔴 VERIFICAR CONEXIÓN
+        if self.db.cur is None:
+            messagebox.showerror("Error", "No hay conexión a la base de datos")
+            return
+            
         seleccion = self.tree_pendientes.selection()
         if not seleccion:
             messagebox.showwarning("Advertencia", "Seleccione una noticia para rechazar")
@@ -650,6 +723,10 @@ class RevisorWindow:
         VerNoticiaPublicadaWindow(self.db, noticia_id)
     
     def mostrar_estadisticas(self):
+        # 🔴 VERIFICAR CONEXIÓN
+        if self.db.cur is None:
+            return
+            
         # Limpiar tab de estadísticas
         for widget in self.tab_estadisticas.winfo_children():
             widget.destroy()
@@ -704,7 +781,9 @@ class RevisorWindow:
         self.ventana.destroy()
         LoginWindow().run()
 
-# Ventana para revisar noticia
+# ============================================
+# VENTANA PARA REVISAR NOTICIA (CORREGIDA)
+# ============================================
 class RevisarNoticiaWindow:
     def __init__(self, db, noticia_id, revisor_id, parent):
         self.db = db
@@ -715,9 +794,17 @@ class RevisarNoticiaWindow:
         self.ventana.title("Revisar Noticia")
         self.ventana.geometry("600x500")
         
+        # ✅ CENTRAR VENTANA
+        centrar_ventana(self.ventana)
+        
         self.cargar_noticia()
     
     def cargar_noticia(self):
+        # 🔴 VERIFICAR CONEXIÓN
+        if self.db.cur is None:
+            messagebox.showerror("Error", "No hay conexión a la base de datos")
+            return
+            
         try:
             self.db.cur.execute("""
                 SELECT n.titulo, n.contenido, n.categoria, n.ubicacion, 
@@ -779,6 +866,11 @@ class RevisarNoticiaWindow:
             messagebox.showerror("Error", f"Error al cargar la noticia: {e}")
     
     def publicar(self):
+        # 🔴 VERIFICAR CONEXIÓN
+        if self.db.cur is None:
+            messagebox.showerror("Error", "No hay conexión a la base de datos")
+            return
+            
         try:
             self.db.cur.execute("""
                 UPDATE noticias 
@@ -799,6 +891,11 @@ class RevisarNoticiaWindow:
     
     def rechazar(self):
         if messagebox.askyesno("Confirmar", "¿Está seguro de rechazar esta noticia?"):
+            # 🔴 VERIFICAR CONEXIÓN
+            if self.db.cur is None:
+                messagebox.showerror("Error", "No hay conexión a la base de datos")
+                return
+                
             try:
                 self.db.cur.execute("""
                     UPDATE noticias 
@@ -815,7 +912,9 @@ class RevisarNoticiaWindow:
             except Exception as e:
                 messagebox.showerror("Error", f"No se pudo rechazar: {e}")
 
-# Ventana para ver detalles de noticia
+# ============================================
+# VENTANA PARA VER DETALLES DE NOTICIA (CORREGIDA)
+# ============================================
 class DetallesNoticiaWindow:
     def __init__(self, db, noticia_id, usuario_id):
         self.db = db
@@ -825,9 +924,17 @@ class DetallesNoticiaWindow:
         self.ventana.title("Detalles de la Denuncia")
         self.ventana.geometry("600x500")
         
+        # ✅ CENTRAR VENTANA
+        centrar_ventana(self.ventana)
+        
         self.cargar_detalles()
     
     def cargar_detalles(self):
+        # 🔴 VERIFICAR CONEXIÓN
+        if self.db.cur is None:
+            messagebox.showerror("Error", "No hay conexión a la base de datos")
+            return
+            
         try:
             self.db.cur.execute("""
                 SELECT titulo, contenido, categoria, ubicacion, estado, 
@@ -882,7 +989,9 @@ class DetallesNoticiaWindow:
         except Exception as e:
             messagebox.showerror("Error", f"Error al cargar detalles: {e}")
 
-# Ventana para ver noticia publicada
+# ============================================
+# VENTANA PARA VER NOTICIA PUBLICADA (CORREGIDA)
+# ============================================
 class VerNoticiaPublicadaWindow:
     def __init__(self, db, noticia_id):
         self.db = db
@@ -891,10 +1000,17 @@ class VerNoticiaPublicadaWindow:
         self.ventana.title("Noticia Publicada")
         self.ventana.geometry("700x600")
         
+        # ✅ CENTRAR VENTANA
+        centrar_ventana(self.ventana)
+        
         self.cargar_noticia()
         self.incrementar_visitas()
     
     def incrementar_visitas(self):
+        # 🔴 VERIFICAR CONEXIÓN
+        if self.db.cur is None:
+            return
+            
         try:
             self.db.cur.execute("""
                 UPDATE noticias SET visitas = visitas + 1 WHERE id = %s
@@ -905,6 +1021,11 @@ class VerNoticiaPublicadaWindow:
             print(f"Error al incrementar visitas: {e}")
     
     def cargar_noticia(self):
+        # 🔴 VERIFICAR CONEXIÓN
+        if self.db.cur is None:
+            messagebox.showerror("Error", "No hay conexión a la base de datos")
+            return
+            
         try:
             self.db.cur.execute("""
                 SELECT n.titulo, n.contenido, n.categoria, n.ubicacion, 
@@ -950,7 +1071,9 @@ class VerNoticiaPublicadaWindow:
         # Aquí se puede implementar la sección de comentarios si se desea
         pass
 
-# Ejecutar la aplicación
+# ============================================
+# EJECUTAR LA APLICACIÓN
+# ============================================
 if __name__ == "__main__":
     app = LoginWindow()
     app.run()

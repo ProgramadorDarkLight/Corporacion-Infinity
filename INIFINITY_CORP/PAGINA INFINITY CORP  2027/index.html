@@ -1,0 +1,786 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Infinity Company | Datos sin Límites</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet" />
+
+    <!-- Font Awesome (Iconos) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+
+    <style>
+        /* ================================================================
+               RESET Y BASE
+            ================================================================ */
+        *,
+        *::before,
+        *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            font-size: 16px;
+            line-height: 1.6;
+            color: #1e293b;
+            background-color: #f8fafc;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        img {
+            max-width: 100%;
+            display: block;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        /* ================================================================
+               TIPOGRAFÍA
+            ================================================================ */
+        .section-title {
+            font-size: 2.5rem;
+            font-weight: 800;
+            text-align: center;
+            margin-bottom: 0.5rem;
+            color: #0f172a;
+            letter-spacing: -0.02em;
+        }
+
+        .section-subtitle {
+            text-align: center;
+            font-size: 1.2rem;
+            color: #64748b;
+            max-width: 700px;
+            margin: 0 auto 3rem auto;
+        }
+
+        /* ================================================================
+               BOTÓN
+            ================================================================ */
+        .btn {
+            display: inline-block;
+            padding: 12px 32px;
+            border-radius: 50px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-primary {
+            background: #0f172a;
+            color: #fff;
+        }
+
+        .btn-primary:hover {
+            background: #1e293b;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(15, 23, 42, 0.15);
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: #0f172a;
+            border: 2px solid #0f172a;
+        }
+
+        .btn-outline:hover {
+            background: #0f172a;
+            color: #fff;
+            transform: translateY(-2px);
+        }
+
+        /* ================================================================
+               HEADER / NAVEGACIÓN
+            ================================================================ */
+        .header {
+            background: #ffffff;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            padding: 16px 0;
+        }
+
+        .header .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: #0f172a;
+            letter-spacing: -0.03em;
+        }
+
+        .logo span {
+            color: #3b82f6;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 32px;
+            list-style: none;
+            font-weight: 600;
+        }
+
+        .nav-links a {
+            color: #334155;
+            transition: color 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            color: #3b82f6;
+        }
+
+        /* ================================================================
+               HERO
+            ================================================================ */
+        .hero {
+            padding: 80px 0 60px;
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            text-align: center;
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            font-weight: 800;
+            line-height: 1.1;
+            color: #0f172a;
+            max-width: 800px;
+            margin: 0 auto 1rem;
+            letter-spacing: -0.03em;
+        }
+
+        .hero h1 span {
+            color: #3b82f6;
+        }
+
+        .hero p {
+            font-size: 1.25rem;
+            color: #475569;
+            max-width: 700px;
+            margin: 0 auto 2.5rem;
+        }
+
+        .hero .btn-group {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        /* ================================================================
+               SERVICIOS
+            ================================================================ */
+        .services {
+            padding: 80px 0;
+            background: #ffffff;
+        }
+
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 32px;
+            margin-top: 20px;
+        }
+
+        .service-card {
+            background: #f8fafc;
+            padding: 32px 24px;
+            border-radius: 16px;
+            transition: all 0.3s ease;
+            border: 1px solid #e2e8f0;
+        }
+
+        .service-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.06);
+            border-color: #3b82f6;
+        }
+
+        .service-card i {
+            font-size: 2.4rem;
+            color: #3b82f6;
+            margin-bottom: 16px;
+        }
+
+        .service-card h3 {
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: #0f172a;
+        }
+
+        .service-card p {
+            color: #64748b;
+            font-size: 0.95rem;
+        }
+
+        /* ================================================================
+               SOLUCIONES / CASO DE ÉXITO
+            ================================================================ */
+        .solutions {
+            padding: 80px 0;
+            background: #f1f5f9;
+        }
+
+        .success-story {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 48px;
+            align-items: center;
+            background: #ffffff;
+            border-radius: 24px;
+            padding: 48px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+        }
+
+        .success-story .content h2 {
+            font-size: 2rem;
+            font-weight: 800;
+            color: #0f172a;
+            margin-bottom: 16px;
+        }
+
+        .success-story .content p {
+            color: #475569;
+            margin-bottom: 20px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px 32px;
+            margin-top: 20px;
+        }
+
+        .stat-item .number {
+            font-size: 2rem;
+            font-weight: 800;
+            color: #3b82f6;
+            display: block;
+        }
+
+        .stat-item .label {
+            font-size: 0.9rem;
+            color: #64748b;
+        }
+
+        .success-story .image-placeholder {
+            background: #e2e8f0;
+            border-radius: 16px;
+            height: 280px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #94a3b8;
+            font-weight: 600;
+        }
+
+        /* ================================================================
+               PROYECTOS
+            ================================================================ */
+        .projects {
+            padding: 80px 0;
+            background: #ffffff;
+        }
+
+        .projects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 32px;
+        }
+
+        .project-card {
+            background: #f8fafc;
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid #e2e8f0;
+            transition: all 0.3s ease;
+        }
+
+        .project-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.06);
+        }
+
+        .project-card .card-img {
+            height: 180px;
+            background: #e2e8f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #94a3b8;
+            font-weight: 600;
+        }
+
+        .project-card .card-body {
+            padding: 24px;
+        }
+
+        .project-card .card-body h3 {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #0f172a;
+            margin-bottom: 8px;
+        }
+
+        .project-card .card-body p {
+            color: #64748b;
+            font-size: 0.95rem;
+            margin-bottom: 16px;
+        }
+
+        .project-card .card-body .btn {
+            padding: 8px 24px;
+            font-size: 0.9rem;
+        }
+
+        /* ================================================================
+               CONTACTO
+            ================================================================ */
+        .contact {
+            padding: 80px 0;
+            background: #0f172a;
+            color: #f8fafc;
+        }
+
+        .contact .section-title {
+            color: #fff;
+        }
+
+        .contact .section-subtitle {
+            color: #94a3b8;
+        }
+
+        .contact-wrapper {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 48px;
+            align-items: start;
+            margin-top: 20px;
+        }
+
+        .contact-info h3 {
+            font-size: 1.5rem;
+            margin-bottom: 16px;
+        }
+
+        .contact-info p {
+            color: #cbd5e1;
+            margin-bottom: 24px;
+        }
+
+        .contact-info .detail {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        .contact-info .detail i {
+            font-size: 1.4rem;
+            color: #3b82f6;
+            width: 28px;
+        }
+
+        .contact-form input,
+        .contact-form textarea {
+            width: 100%;
+            padding: 14px 18px;
+            border-radius: 12px;
+            border: none;
+            background: #1e293b;
+            color: #fff;
+            font-family: inherit;
+            margin-bottom: 16px;
+            font-size: 1rem;
+        }
+
+        .contact-form input::placeholder,
+        .contact-form textarea::placeholder {
+            color: #94a3b8;
+        }
+
+        .contact-form textarea {
+            min-height: 140px;
+            resize: vertical;
+        }
+
+        .contact-form .btn {
+            background: #3b82f6;
+            color: #fff;
+            width: 100%;
+            text-align: center;
+        }
+
+        .contact-form .btn:hover {
+            background: #2563eb;
+        }
+
+        /* ================================================================
+               FOOTER
+            ================================================================ */
+        .footer {
+            background: #0a0f1a;
+            padding: 40px 0;
+            text-align: center;
+            color: #94a3b8;
+            border-top: 1px solid #1e293b;
+        }
+
+        .footer .logo {
+            color: #fff;
+            margin-bottom: 8px;
+        }
+
+        .footer .socials {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin: 16px 0;
+        }
+
+        .footer .socials a {
+            color: #94a3b8;
+            font-size: 1.4rem;
+            transition: color 0.3s ease;
+        }
+
+        .footer .socials a:hover {
+            color: #3b82f6;
+        }
+
+        /* ================================================================
+               RESPONSIVE
+            ================================================================ */
+        @media (max-width: 992px) {
+            .success-story {
+                grid-template-columns: 1fr;
+                padding: 32px;
+            }
+
+            .contact-wrapper {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .section-title {
+                font-size: 2rem;
+            }
+
+            .nav-links {
+                display: none;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .services-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .services-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .projects-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .hero .btn-group {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .hero h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ============================== -->
+    <!-- HEADER                         -->
+    <!-- ============================== -->
+    <header class="header">
+        <div class="container">
+            <a href="#" class="logo">Infinity<span>.</span></a>
+            <ul class="nav-links">
+                <li><a href="#services">Servicios</a></li>
+                <li><a href="#solutions">Soluciones</a></li>
+                <li><a href="#projects">Proyectos</a></li>
+                <li><a href="#contact">Contacto</a></li>
+            </ul>
+        </div>
+    </header>
+
+    <!-- ============================== -->
+    <!-- HERO                           -->
+    <!-- ============================== -->
+    <section class="hero">
+        <div class="container">
+            <h1>Datos sin <span>Límites</span> … Decisiones sin <span>Fronteras</span></h1>
+            <p>Transformamos datos en conocimiento accionable para que tu organización anticipe el futuro y tome decisiones basadas en hechos.</p>
+            <div class="btn-group">
+                <a href="#contact" class="btn btn-primary">Hablemos</a>
+                <a href="#services" class="btn btn-outline">Nuestros Servicios</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================== -->
+    <!-- SERVICIOS                      -->
+    <!-- ============================== -->
+    <section class="services" id="services">
+        <div class="container">
+            <h2 class="section-title">Nuestros Servicios</h2>
+            <p class="section-subtitle">Soluciones analíticas y de reporting diseñadas para impulsar la toma de decisiones.</p>
+
+            <div class="services-grid">
+                <div class="service-card">
+                    <i class="fas fa-chart-line"></i>
+                    <h3>Reporting por Tiempo</h3>
+                    <p>Reportes periódicos, programados y bajo demanda para un seguimiento continuo.</p>
+                </div>
+                <div class="service-card">
+                    <i class="fas fa-chart-pie"></i>
+                    <h3>Reporting Analítico</h3>
+                    <p>Análisis de contenido, predictivo y estadístico para insights profundos.</p>
+                </div>
+                <div class="service-card">
+                    <i class="fas fa-briefcase"></i>
+                    <h3>Reporting de Negocio</h3>
+                    <p>Reportes financieros, comerciales, de marketing e informativos.</p>
+                </div>
+                <div class="service-card">
+                    <i class="fas fa-heartbeat"></i>
+                    <h3>Reporting por Dominio</h3>
+                    <p>Especializados en salud, educación y reportes técnicos.</p>
+                </div>
+                <div class="service-card">
+                    <i class="fas fa-window-maximize"></i>
+                    <h3>Diseño Web</h3>
+                    <p>Interfaces modernas, desarrollo front-end y experiencias responsivas.</p>
+                </div>
+                <div class="service-card">
+                    <i class="fas fa-edit"></i>
+                    <h3>Gestión de Formularios</h3>
+                    <p>Creación, administración y personalización de formularios externos.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================== -->
+    <!-- SOLUCIONES / CASO DE ÉXITO    -->
+    <!-- ============================== -->
+    <section class="solutions" id="solutions">
+        <div class="container">
+            <h2 class="section-title">Nuestras Soluciones</h2>
+            <p class="section-subtitle">Transformamos datos en impacto medible a través de inteligencia analítica.</p>
+
+            <div class="success-story">
+                <div class="content">
+                    <h2>Kids World Store – Transformación Digital</h2>
+                    <p>Mediante análisis avanzado de datos y reporting en tiempo real, Kids World Store logró identificar puntos críticos de abandono en el recorrido de compra y optimizarlos, logrando un crecimiento medible en rendimiento y experiencia del cliente.</p>
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <span class="number">100%</span>
+                            <span class="label">Abandono de carrito detectado</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="number">40%</span>
+                            <span class="label">Crecimiento en conversión (Año 1)</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="number">60%</span>
+                            <span class="label">Eficiencia operativa</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="number">3x</span>
+                            <span class="label">Retorno sobre inversión publicitaria</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="image-placeholder">
+                    <i class="fas fa-chart-simple" style="font-size:4rem; opacity:0.5;"></i>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================== -->
+    <!-- PROYECTOS                      -->
+    <!-- ============================== -->
+    <section class="projects" id="projects">
+        <div class="container">
+            <h2 class="section-title">Nuestros Proyectos</h2>
+            <p class="section-subtitle">Soluciones analíticas que combinan datos, predicción e inteligencia interactiva.</p>
+
+            <div class="projects-grid">
+
+                <!-- Proyecto 1 -->
+                <div class="project-card">
+                    <div class="card-img">
+                        <i class="fas fa-film" style="font-size:2.5rem; opacity:0.5;"></i>
+                    </div>
+                    <div class="card-body">
+                        <h3>Netflix Content Intelligence</h3>
+                        <p>Análisis avanzado de 5.806 títulos para identificar tendencias, gaps de contenido y distribución de audiencia.</p>
+                        <a href="#" class="btn btn-primary" style="padding:8px 24px; font-size:0.9rem;">Ver Proyecto</a>
+                    </div>
+                </div>
+
+                <!-- Proyecto 2 -->
+                <div class="project-card">
+                    <div class="card-img">
+                        <i class="fas fa-globe" style="font-size:2.5rem; opacity:0.5;"></i>
+                    </div>
+                    <div class="card-body">
+                        <h3>Global Market Analytics Dashboard</h3>
+                        <p>Dashboard interactivo con análisis en más de 8 países, con filtros por país y vistas por fecha y palabras clave.</p>
+                        <a href="#" class="btn btn-primary" style="padding:8px 24px; font-size:0.9rem;">Ver Proyecto</a>
+                    </div>
+                </div>
+
+                <!-- Proyecto 3 -->
+                <div class="project-card">
+                    <div class="card-img">
+                        <i class="fas fa-heartbeat" style="font-size:2.5rem; opacity:0.5;"></i>
+                    </div>
+                    <div class="card-body">
+                        <h3>Detección Temprana de Cáncer Gástrico</h3>
+                        <p>Proyecto de salud que identifica patrones clave para apoyar el diagnóstico temprano a través de análisis de datos.</p>
+                        <a href="#" class="btn btn-primary" style="padding:8px 24px; font-size:0.9rem;">Ver Proyecto</a>
+                    </div>
+                </div>
+
+                <!-- Proyecto 4 -->
+                <div class="project-card">
+                    <div class="card-img">
+                        <i class="fas fa-table" style="font-size:2.5rem; opacity:0.5;"></i>
+                    </div>
+                    <div class="card-body">
+                        <h3>Sales Dashboard (Tableau)</h3>
+                        <p>Dashboard visual para monitorear rendimiento de ventas, KPIs y tendencias con filtros interactivos.</p>
+                        <a href="#" class="btn btn-primary" style="padding:8px 24px; font-size:0.9rem;">Ver Proyecto</a>
+                    </div>
+                </div>
+
+                <!-- Proyecto 5 -->
+                <div class="project-card">
+                    <div class="card-img">
+                        <i class="fas fa-chart-bar" style="font-size:2.5rem; opacity:0.5;"></i>
+                    </div>
+                    <div class="card-body">
+                        <h3>Children's Game Store Sales Analysis</h3>
+                        <p>Análisis de ventas en Excel con funciones dinámicas para calcular beneficios anuales, mensuales y top 5 de productos.</p>
+                        <a href="#" class="btn btn-primary" style="padding:8px 24px; font-size:0.9rem;">Ver Proyecto</a>
+                    </div>
+                </div>
+
+                <!-- Proyecto 6 -->
+                <div class="project-card">
+                    <div class="card-img">
+                        <i class="fas fa-calendar-check" style="font-size:2.5rem; opacity:0.5;"></i>
+                    </div>
+                    <div class="card-body">
+                        <h3>Monthly Performance Report Dashboard</h3>
+                        <p>Reporte estructurado de rendimiento mensual con comparativas y seguimiento de indicadores operativos.</p>
+                        <a href="#" class="btn btn-primary" style="padding:8px 24px; font-size:0.9rem;">Ver Proyecto</a>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================== -->
+    <!-- CONTACTO                       -->
+    <!-- ============================== -->
+    <section class="contact" id="contact">
+        <div class="container">
+            <h2 class="section-title">Hablemos</h2>
+            <p class="section-subtitle">Déjanos un mensaje y te contactaremos para llevar tus datos al siguiente nivel.</p>
+
+            <div class="contact-wrapper">
+                <div class="contact-info">
+                    <h3>Infinity Company</h3>
+                    <p>Transformamos datos en decisiones. Estamos listos para ser tu aliado estratégico.</p>
+                    <div class="detail">
+                        <i class="fas fa-map-pin"></i>
+                        <span>Bogotá, Colombia</span>
+                    </div>
+                    <div class="detail">
+                        <i class="fas fa-envelope"></i>
+                        <span>hola@infinitycompany.co</span>
+                    </div>
+                    <div class="detail">
+                        <i class="fas fa-phone"></i>
+                        <span>+57 300 737 6837</span>
+                    </div>
+                </div>
+
+                <div class="contact-form">
+                    <form>
+                        <input type="text" placeholder="Nombre completo" required />
+                        <input type="email" placeholder="Correo electrónico" required />
+                        <input type="text" placeholder="Asunto" />
+                        <textarea placeholder="Cuéntanos sobre tu proyecto..."></textarea>
+                        <button type="submit" class="btn">Enviar mensaje</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================== -->
+    <!-- FOOTER                         -->
+    <!-- ============================== -->
+    <footer class="footer">
+        <div class="container">
+            <a href="#" class="logo">Infinity<span>.</span></a>
+            <div class="socials">
+                <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+                <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+                <a href="#" aria-label="GitHub"><i class="fab fa-github"></i></a>
+                <a href="#" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
+            </div>
+            <p style="margin-top:16px; font-size:0.9rem;">&copy; 2026 Infinity Company. Todos los derechos reservados.</p>
+        </div>
+    </footer>
+
+</body>
+</html>
