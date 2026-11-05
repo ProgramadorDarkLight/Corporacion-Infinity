@@ -496,13 +496,15 @@ class CiudadanoWindow:
 # VENTANA PARA REVISORES (CORREGIDA)
 # ============================================
 class RevisorWindow:
+
     def __init__(self, usuario_id, username):
+        
         self.usuario_id = usuario_id
         self.username = username
         self.ventana = tk.Tk()
         self.ventana.title(f"El Hormiguero Ibagué - Panel de Revisor - {username}")
         self.ventana.geometry("1000x700")
-        
+            
         # ✅ CENTRAR VENTANA
         centrar_ventana(self.ventana)
         
